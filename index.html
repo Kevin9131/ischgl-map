@@ -1624,7 +1624,7 @@ function trkSave(){try{localStorage.setItem('ischgl-tracks',JSON.stringify(TRK.d
 function trkLoad(){try{const a=JSON.parse(localStorage.getItem('ischgl-tracks')||'null');if(!a||!a.length)return;TRK.days=a.map(d=>({file:d.file,name:d.name,date:d.date,pts:d.p.map(q=>[q[0]/1e5,q[1]/1e5,q[2],q[3]*1000])}));analyse();if(localStorage.getItem('ischgl-mode')==='mine')setTimeout(()=>setMode('mine'),0)}catch(e){}}
 let trkNote='';function trkMsg(m){trkNote=m;if(state.tab==='runs')buildList()}
 async function trkImport(files){let added=0,skipped=0,errs=[];for(const f of files){try{const d=parseTrackFile(await f.text(),f.name);
-      if(TRK.days.some(x=>x.date===d.date&&x.pts.length===d.pts.length)){skipped++;continue}TRK.days.push(d);added++}catch(e){errs.push(f.name)}}
+      if(TRK.days.some(x=>x.date===d.date&&x.pts.length===d.pts.length)){skipped++;continue}TRK.days.push(d);added++}catch(e){errs.push(f.name+(/\.(gpx|kml)$/i.test(f.name)?'':' (not a GPX/KML file)'))}}
   TRK.days.sort((a,b)=>(a.date||'').localeCompare(b.date||''));analyse();trkSave();
   trkNote=`${added} day${added===1?'':'s'} imported${skipped?`, ${skipped} already there`:''}${errs.length?`. Couldn't read: ${errs.join(', ')}`:''}.`;
   if(added&&state.mode!=='mine')setMode('mine');else{render();buildList()}}
@@ -1644,7 +1644,7 @@ function progressHTML(){const gs=groupsSorted;const by={blue:[0,0],red:[0,0],bla
    <div class="msub">${lr} of ${lifts.length} lifts ridden · top speed ${Math.round(tot.top)} km/h</div>
    <div class="mfil" id="mfil"><button data-f="todo">To discover</button><button data-f="done">Boarded</button><button data-f="all">All</button></div></div>`}
 let trkFilter='todo';
-function trkImportBox(){return `<div class="mimp"><label class="mbtn">${TRK.days.length?'+ Add more days':'Import Ski Tracks files'}<input type="file" id="trkfile" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple hidden></label>
+function trkImportBox(){return `<div class="mimp"><label class="mbtn">${TRK.days.length?'+ Add more days':'Import Ski Tracks files'}<input type="file" id="trkfile" multiple hidden></label>
   ${TRK.days.length?`<button class="mclr" id="trkclr">Remove all</button>`:''}</div>
   ${trkNote?`<div class="mnote">${trkNote}</div>`:''}
   ${TRK.days.length?'':`<div class="note" style="padding-top:2px">Export your days from Ski Tracks as GPX (or KML) and pick them here. Everything stays on this device; nothing is uploaded.</div>`}`}
