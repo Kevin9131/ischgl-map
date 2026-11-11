@@ -872,6 +872,10 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .msub{font-size:11.5px;color:var(--muted);margin:4px 0 8px}
 .mfil{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:6px 0 8px}
 .mfil button{flex:1;border:0;background:#fff;font:inherit;font-size:12.5px;padding:7px;cursor:pointer;color:var(--muted)}.mfil button.on{background:#7a3e9d;color:#fff}
+.pdone{background:#12a150!important;border-color:#fff!important;color:#fff!important;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+#minebar{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:850;background:#fff;border-radius:999px;padding:7px 14px;font-size:12.5px;box-shadow:0 2px 12px rgba(0,0,0,.2);display:none;white-space:nowrap;cursor:pointer}
+#minebar b{color:#12a150}
+@media (max-width:760px){#minebar{bottom:calc(128px + env(safe-area-inset-bottom));font-size:12px;padding:6px 12px}}
 .item .done{color:#12a150;font-weight:900}.item .half{font-size:11px;color:#7a3e9d;font-weight:700}
 #toggle,#grab{display:none}
 /* GPS */
@@ -963,7 +967,7 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
     </div>
     <div id="list"></div>
   </aside>
-  <div id="map" style="position:relative"><div id="card"></div><div id="gpsbar"></div></div>
+  <div id="map" style="position:relative"><div id="card"></div><div id="gpsbar"></div><div id="minebar"></div></div>
 </div>
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1135,7 +1139,7 @@ function render(){
   // casings first, then lines (black on top)
   const order={blue:0,route:1,red:2,black:3};
   const vis=runLayers.filter(o=>state.show[o.r.c]).sort((a,b)=>order[a.r.c]-order[b.r.c]);
-  vis.forEach(o=>{o.casing.setStyle({weight:w+3.5});runLayerGroup.addLayer(o.casing)});
+  vis.forEach(o=>{const dn=state.mode==='mine'&&TRK.days.length&&o.r.g&&o.r.g.st===2;o.casing.setStyle({weight:dn?w+8:w+3.5,color:dn?'#2bd46a':'#fff',opacity:dn?.85:.9});runLayerGroup.addLayer(o.casing)});
   liftLayers.forEach(o=>{if(state.show[o.l.grp])runLayerGroup.addLayer(o.casing)});
   const sun=state.mode==='sun'?sunNow():null;
   const mine=state.mode==='mine';const visO=mine?[...vis].sort((a,b)=>((a.r.g&&a.r.g.st)||0)-((b.r.g&&b.r.g.st)||0)):vis;
@@ -1144,7 +1148,8 @@ function render(){
   liftLayers.forEach(o=>{if(!state.show[o.l.grp])return;const ridden=!mine||!TRK.days.length||o.l.uc||(TRK.liftRides&&TRK.liftRides.get(o.l.i));o.line.setStyle({opacity:ridden?(o.l.uc?.85:1):.3});runLayerGroup.addLayer(o.line);if(!ridden)return;if(o.flow&&state.show.arrows&&z>=12.5)runLayerGroup.addLayer(o.flow);if(z>=13.5||o.l.grp!=='drag'){runLayerGroup.addLayer(o.a);runLayerGroup.addLayer(o.b)}if(o.ref&&z>=13.75)runLayerGroup.addLayer(o.ref)});
   // numbers
   numLayer.clearLayers();
-  if(z>=14){Object.values(runGroups).forEach(g=>{if(g.labelLL&&state.show[g.c])L.marker(g.labelLL,{interactive:false,icon:L.divIcon({className:'',html:`<div class="pnum" style="border-color:${COL[g.c]};color:${g.c==='route'?'#a85d00':COL[g.c]}">${g.n}</div>`,iconSize:[0,0]})}).addTo(numLayer)});if(!map.hasLayer(numLayer))numLayer.addTo(map)}else map.removeLayer(numLayer);
+  if(state.mode==='mine'&&TRK.days.length&&z>=12.5){Object.values(runGroups).forEach(g=>{if(!g.labelLL||!state.show[g.c])return;if(g.st!==2&&z<14)return;L.marker(g.labelLL,{interactive:false,zIndexOffset:g.st===2?600:0,icon:L.divIcon({className:'',html:g.st===2?`<div class="pnum pdone">✓ ${g.n}</div>`:`<div class="pnum" style="border-color:#9aa6b2;color:#6b7785">${g.n}${g.st===1?' ½':''}</div>`,iconSize:[0,0]})}).addTo(numLayer)});if(!map.hasLayer(numLayer))numLayer.addTo(map)}
+  else if(z>=14){Object.values(runGroups).forEach(g=>{if(g.labelLL&&state.show[g.c])L.marker(g.labelLL,{interactive:false,icon:L.divIcon({className:'',html:`<div class="pnum" style="border-color:${COL[g.c]};color:${g.c==='route'?'#a85d00':COL[g.c]}">${g.n}</div>`,iconSize:[0,0]})}).addTo(numLayer)});if(!map.hasLayer(numLayer))numLayer.addTo(map)}else map.removeLayer(numLayer);
   state.show.huts?hutLayer.addTo(map):map.removeLayer(hutLayer);
   state.show.labels?labelLayer.addTo(map):map.removeLayer(labelLayer);
   if(reliefLayer){state.show.relief?reliefLayer.addTo(map):map.removeLayer(reliefLayer)}
@@ -1152,6 +1157,7 @@ function render(){
   renderArrows();
   if(typeof wxBadges==='function')wxBadges();
   if(typeof drawTracks==='function')drawTracks();
+  if(typeof mineBanner==='function')mineBanner();
 }
 map.on('zoomend',render);
 
@@ -1615,14 +1621,14 @@ function analyse(){pisteIndex();PN.nodes.forEach(n=>n.hit=0);const rides=new Map
   TRK.runFrac=frac;TRK.liftRides=rides;
   Object.values(runGroups).forEach(g=>{let h=0,t=0;g.segs.forEach(s=>{const f=frac.get(s.i)||[0,0];h+=f[0];t+=f[1]});g.cov=t?h/t:0;g.st=g.cov>=0.6?2:g.cov>=0.2?1:0})}
 function trkSave(){try{localStorage.setItem('ischgl-tracks',JSON.stringify(TRK.days.map(d=>({file:d.file,name:d.name,date:d.date,p:d.pts.map(q=>[Math.round(q[0]*1e5),Math.round(q[1]*1e5),Math.round(q[2]),Math.round((q[3]||0)/1000)])}))))}catch(e){trkMsg('Your phone ran out of storage space for tracks. They work for now but won\'t be remembered.')}}
-function trkLoad(){try{const a=JSON.parse(localStorage.getItem('ischgl-tracks')||'null');if(!a||!a.length)return;TRK.days=a.map(d=>({file:d.file,name:d.name,date:d.date,pts:d.p.map(q=>[q[0]/1e5,q[1]/1e5,q[2],q[3]*1000])}));analyse()}catch(e){}}
+function trkLoad(){try{const a=JSON.parse(localStorage.getItem('ischgl-tracks')||'null');if(!a||!a.length)return;TRK.days=a.map(d=>({file:d.file,name:d.name,date:d.date,pts:d.p.map(q=>[q[0]/1e5,q[1]/1e5,q[2],q[3]*1000])}));analyse();if(localStorage.getItem('ischgl-mode')==='mine')setTimeout(()=>setMode('mine'),0)}catch(e){}}
 let trkNote='';function trkMsg(m){trkNote=m;if(state.tab==='runs')buildList()}
 async function trkImport(files){let added=0,skipped=0,errs=[];for(const f of files){try{const d=parseTrackFile(await f.text(),f.name);
       if(TRK.days.some(x=>x.date===d.date&&x.pts.length===d.pts.length)){skipped++;continue}TRK.days.push(d);added++}catch(e){errs.push(f.name)}}
   TRK.days.sort((a,b)=>(a.date||'').localeCompare(b.date||''));analyse();trkSave();
   trkNote=`${added} day${added===1?'':'s'} imported${skipped?`, ${skipped} already there`:''}${errs.length?`. Couldn't read: ${errs.join(', ')}`:''}.`;
   if(added&&state.mode!=='mine')setMode('mine');else{render();buildList()}}
-function setMode(m){document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x.dataset.m===m));state.mode=m;document.getElementById('sunbox').classList.toggle('on',m==='sun');if(m!=='sun')stopPlay();updateSunUI();render();refreshCard();buildList()}
+var setMode=function(m){document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x.dataset.m===m));state.mode=m;document.getElementById('sunbox').classList.toggle('on',m==='sun');if(m!=='sun')stopPlay();updateSunUI();render();refreshCard();buildList()}
 const trkLayer=L.layerGroup();
 function drawTracks(){trkLayer.clearLayers();if(state.mode!=='mine'||!state.show.mytracks||!TRK.days.length){map.removeLayer(trkLayer);return}
   TRK.days.forEach(d=>{const ll=[];for(let i=0;i<d.pts.length;i+=2)ll.push([d.pts[i][0],d.pts[i][1]]);L.polyline(ll,{renderer:canvas,color:'#7a3e9d',weight:1.6,opacity:.55,interactive:false}).addTo(trkLayer)});
@@ -1647,6 +1653,14 @@ function wireImport(el){const f=el.querySelector('#trkfile');if(f)f.onchange=e=>
   el.querySelectorAll('#mfil button').forEach(b=>{b.classList.toggle('on',b.dataset.f===trkFilter);b.onclick=()=>{trkFilter=b.dataset.f;buildList()}})}
 function mineStyle(o,w){const g=o.r.g,st=g&&g.st||0;if(!TRK.days.length)return {color:COL[o.r.c],weight:w,opacity:1};
   return st===2?{color:COL[o.r.c],weight:w+.6,opacity:1}:st===1?{color:COL[o.r.c],weight:w,opacity:.55,dashArray:'7 6'}:{color:'#9aa6b2',weight:Math.max(1.6,w-1.2),opacity:.75,dashArray:o.r.c==='route'?'6 6':null}}
+
+function mineBanner(){const el=document.getElementById('minebar');if(!el)return;if(state.mode!=='mine'){el.style.display='none';return}
+  if(!TRK.days.length){el.innerHTML='No tracks yet · <b style="color:#7a3e9d">tap to import your Ski Tracks files</b>'}
+  else{const d=groupsSorted.filter(g=>g.st===2).length;el.innerHTML=`<b>✓ ${d} of ${groupsSorted.length} boarded</b> · green = done · grey = still to discover`}
+  el.style.display='block';el.onclick=()=>{setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}}
+L.DomEvent.disableClickPropagation(document.getElementById('minebar'));
+// remember the Mine view when tracks exist
+const _setMode=setMode;setMode=function(m){_setMode(m);try{localStorage.setItem('ischgl-mode',m)}catch(e){}};
 
 
 // ===== sun UI =====
