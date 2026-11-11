@@ -858,6 +858,21 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .soswhere{margin-top:10px;font-size:12.5px;padding-right:64px!important;background:#eef5fd;border-radius:8px;padding:8px 10px;line-height:1.45;position:relative}
 .soswhere button{position:absolute;right:8px;top:8px;border:1px solid var(--line);background:#fff;border-radius:6px;font:inherit;font-size:11.5px;padding:3px 8px;cursor:pointer}
 .sostip{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.45}
+.mimp{display:flex;gap:8px;padding:12px 16px 4px;align-items:center}
+.mbtn{flex:1;display:block;text-align:center;background:#7a3e9d;color:#fff;font-weight:700;font-size:14px;padding:11px;border-radius:10px;cursor:pointer}
+.mclr{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;font:inherit;font-size:13px;cursor:pointer;color:var(--muted)}
+.mnote{margin:6px 16px 0;font-size:12px;color:#5b2d76;background:#f4ecf8;border-radius:8px;padding:7px 10px}
+.mine{padding:8px 16px 4px;border-bottom:1px solid var(--line)}
+.mbig{font-size:15px;margin:6px 0 8px}.mbig b{font-size:24px;color:#7a3e9d}.mbig span{font-size:12.5px;color:var(--muted)}
+.pbar{display:grid;grid-template-columns:52px 1fr 44px;align-items:center;gap:8px;font-size:12px;margin:5px 0}
+.pt{height:9px;background:#edf1f4;border-radius:5px;overflow:hidden}.pt div{height:100%;border-radius:5px}
+.pn{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}.pl{color:var(--muted)}
+.mstats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0 4px}
+.mstats div{background:#f6f2f9;border-radius:8px;padding:6px 2px;text-align:center}.mstats b{display:block;font-size:14px}.mstats span{font-size:10.5px;color:var(--muted)}
+.msub{font-size:11.5px;color:var(--muted);margin:4px 0 8px}
+.mfil{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:6px 0 8px}
+.mfil button{flex:1;border:0;background:#fff;font:inherit;font-size:12.5px;padding:7px;cursor:pointer;color:var(--muted)}.mfil button.on{background:#7a3e9d;color:#fff}
+.item .done{color:#12a150;font-weight:900}.item .half{font-size:11px;color:#7a3e9d;font-weight:700}
 #toggle,#grab{display:none}
 /* GPS */
 .locbtn{width:34px;height:34px;background:#fff;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;padding:0}
@@ -929,7 +944,7 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
     <div class="controls">
       <input id="q" class="search" type="search" placeholder="Search piste no., lift or restaurant…" autocomplete="off">
       <div class="chips" id="chips"></div>
-      <div class="mode" id="mode"><button data-m="diff" class="on">Difficulty</button><button data-m="elev">Altitude</button><button data-m="sun">☀ Sun &amp; shade</button></div>
+      <div class="mode" id="mode"><button data-m="diff" class="on">Difficulty</button><button data-m="elev">Altitude</button><button data-m="sun">☀ Sun</button><button data-m="mine">✓ Mine</button></div>
       <div id="sunbox">
         <div class="sunrow"><input type="date" id="sdate"><span style="font-size:11.5px;color:#8a7440" id="sdatelab"></span></div>
         <div class="presets" id="spresets"></div>
@@ -966,7 +981,7 @@ const COL={blue:'#1f6fe0',red:'#e0312b',black:'#111111',route:'#f08a00'};
 const DIFFNAME={blue:'Blue · easy',red:'Red · intermediate',black:'Black · difficult',route:'Ski route (ungroomed, unpatrolled)'};
 const HUT_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M8.1 13.34l2.83-2.83L3.91 3.5a4.008 4.008 0 000 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>';
 const LIFT_GROUP={gondola:'cable',cable_car:'cable',chair_lift:'chair','t-bar':'drag',platter:'drag',drag_lift:'drag',magic_carpet:'drag'};
-const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:1,labels:1,arrows:1,weather:1,relief:1},mode:'diff',tab:'huts',q:'',sel:null};
+const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:1,labels:1,arrows:1,weather:1,relief:1,mytracks:1},mode:'diff',tab:'huts',q:'',sel:null};
 
 // rotated CRS: 180° (south up) so the Ischgl valley sits at the bottom
 const SM=L.Projection.SphericalMercator;
@@ -1097,7 +1112,7 @@ function renderArrows(){arrowLayer.clearLayers();if(!state.show.arrows)return;co
   const add=(ll,html)=>{if(vb.contains(ll))L.marker(ll,{interactive:false,keyboard:false,icon:L.divIcon({className:'',html,iconSize:[0,0]})}).addTo(arrowLayer)};
   // pistes: chevrons pointing downhill
   if(z>=13.75){const step=z>=15.5?110:z>=14.5?180:320;
-    runLayers.forEach(o=>{const r=o.r;if(!state.show[r.c])return;const col=state.mode==='diff'?COL[r.c]:state.mode==='sun'?'#3a4256':null;
+    runLayers.forEach(o=>{const r=o.r;if(!state.show[r.c])return;const col=state.mode==='diff'?COL[r.c]:(state.mode==='sun'||state.mode==='mine')?'#3a4256':null;
       let pts=along(r.p,step);if(!pts.length&&r.l>60){const m=Math.floor((r.p.length-1)/2);pts=[{ll:[(r.p[m][0]+r.p[m+1][0])/2,(r.p[m][1]+r.p[m+1][1])/2],h:bearing(r.p[m],r.p[m+1])}]}
       pts.forEach(q=>add(q.ll,pisteArrow(col||ecol(r.t-(r.t-r.b)/2),q.h)))})}
   // lifts: uphill arrows, at least one per lift
@@ -1123,8 +1138,10 @@ function render(){
   vis.forEach(o=>{o.casing.setStyle({weight:w+3.5});runLayerGroup.addLayer(o.casing)});
   liftLayers.forEach(o=>{if(state.show[o.l.grp])runLayerGroup.addLayer(o.casing)});
   const sun=state.mode==='sun'?sunNow():null;
-  vis.forEach(o=>{if(state.mode==='diff'){o.line.setStyle({weight:w});runLayerGroup.addLayer(o.line)}else{o.el.forEach((s,k)=>{const st={weight:w+.3};if(sun){st.color=scol(insol(sun,o.r.geo[k]))}else st.color=ecol((o.r.p[k][2]+o.r.p[k+1][2])/2);s.setStyle(st);runLayerGroup.addLayer(s)})}});
-  liftLayers.forEach(o=>{if(!state.show[o.l.grp])return;runLayerGroup.addLayer(o.line);if(o.flow&&state.show.arrows&&z>=12.5)runLayerGroup.addLayer(o.flow);if(z>=13.5||o.l.grp!=='drag'){runLayerGroup.addLayer(o.a);runLayerGroup.addLayer(o.b)}if(o.ref&&z>=13.75)runLayerGroup.addLayer(o.ref)});
+  const mine=state.mode==='mine';const visO=mine?[...vis].sort((a,b)=>((a.r.g&&a.r.g.st)||0)-((b.r.g&&b.r.g.st)||0)):vis;
+  if(mine)visO.forEach(o=>{o.line.setStyle(Object.assign({dashArray:o.r.c==='route'?'6 6':null},mineStyle(o,w)));runLayerGroup.addLayer(o.line)});
+  else vis.forEach(o=>{if(state.mode==='diff'){o.line.setStyle({weight:w,color:COL[o.r.c],opacity:.95,dashArray:o.r.c==='route'?'6 6':null});runLayerGroup.addLayer(o.line)}else{o.el.forEach((s,k)=>{const st={weight:w+.3};if(sun){st.color=scol(insol(sun,o.r.geo[k]))}else st.color=ecol((o.r.p[k][2]+o.r.p[k+1][2])/2);s.setStyle(st);runLayerGroup.addLayer(s)})}});
+  liftLayers.forEach(o=>{if(!state.show[o.l.grp])return;const ridden=!mine||!TRK.days.length||o.l.uc||(TRK.liftRides&&TRK.liftRides.get(o.l.i));o.line.setStyle({opacity:ridden?(o.l.uc?.85:1):.3});runLayerGroup.addLayer(o.line);if(!ridden)return;if(o.flow&&state.show.arrows&&z>=12.5)runLayerGroup.addLayer(o.flow);if(z>=13.5||o.l.grp!=='drag'){runLayerGroup.addLayer(o.a);runLayerGroup.addLayer(o.b)}if(o.ref&&z>=13.75)runLayerGroup.addLayer(o.ref)});
   // numbers
   numLayer.clearLayers();
   if(z>=14){Object.values(runGroups).forEach(g=>{if(g.labelLL&&state.show[g.c])L.marker(g.labelLL,{interactive:false,icon:L.divIcon({className:'',html:`<div class="pnum" style="border-color:${COL[g.c]};color:${g.c==='route'?'#a85d00':COL[g.c]}">${g.n}</div>`,iconSize:[0,0]})}).addTo(numLayer)});if(!map.hasLayer(numLayer))numLayer.addTo(map)}else map.removeLayer(numLayer);
@@ -1134,6 +1151,7 @@ function render(){
   legend.update();
   renderArrows();
   if(typeof wxBadges==='function')wxBadges();
+  if(typeof drawTracks==='function')drawTracks();
 }
 map.on('zoomend',render);
 
@@ -1141,6 +1159,7 @@ map.on('zoomend',render);
 const legend=L.control({position:'bottomright'});
 legend.onAdd=function(){this.div=L.DomUtil.create('div','legend');return this.div};
 legend.update=function(){if(!this.div)return;
+  if(state.mode==='mine'){this.div.innerHTML=TRK.days.length?`<div class="r"><span class="ln" style="background:#e0312b"></span>Boarded</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,#e0312b 0 6px,transparent 6px 10px);opacity:.6"></span>Partly boarded</div><div class="r"><span class="ln" style="background:#9aa6b2"></span>Still to discover</div><div class="r"><span class="ln" style="background:#7a3e9d;height:2px"></span>Your tracks</div><div class="r"><span class="ln" style="background:#2d3238;opacity:.3"></span>Lift not ridden yet</div>`:'<b>My pistes</b><br>Import your Ski Tracks files<br>in the Pistes tab';return}
   if(state.mode==='sun'){this.div.innerHTML=`<b>Sun on the slope · ${fmtT(sunState.mins)}</b><div class="elev-bar" style="background:linear-gradient(90deg,rgb(70,84,122) 0%,rgb(118,126,150) 4%,rgb(255,240,170) 7%,rgb(255,205,70) 25%,rgb(255,140,20) 50%,rgb(220,70,0) 80%,rgb(200,50,0))"></div><div class="elev-lab"><span>Shade</span><span>Weak</span><span>Full sun</span></div>`;return}
   this.div.innerHTML=state.mode==='diff'
    ?`<div class="r"><span class="ln" style="background:${COL.blue}"></span>Easy</div><div class="r"><span class="ln" style="background:${COL.red}"></span>Intermediate</div><div class="r"><span class="ln" style="background:${COL.black}"></span>Difficult</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,${COL.route} 0 5px,transparent 5px 9px)"></span>Ski route</div><div class="r"><span class="ln" style="background:#2d3238;height:3px"></span>Lift</div><div class="r"><svg width="22" height="18" viewBox="-11 -9 22 18" style="transform:rotate(90deg)"><path d="M0 -8 L6 5 L0 1.8 L-6 5 Z" fill="#15202b" stroke="#fff" stroke-width="1.5"/></svg>Lift direction (uphill)</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,#8a95a1 0 6px,transparent 6px 10px)"></span>Under construction</div><div class="r"><svg width="22" height="16" viewBox="-11 -8 22 16"><circle cx="-6" r="3.3" fill="#fff" stroke="#2d3238" stroke-width="2"/><circle cx="6" r="4" fill="#2d3238"/></svg>Valley ○ · ● Top station</div><div class="r"><svg width="22" height="16" viewBox="-11 -8 22 16"><path d="M-5 -1 L0 4 L5 -1" fill="none" stroke="#e0312b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Piste direction (downhill)</div>`
@@ -1177,7 +1196,7 @@ function selectRun(g,fly){clearSel();state.sel='r:'+g.key;
   <div class="bd"><dl><dt>Mapped length</dt><dd>${fmtLen(g.len)}${g.segs.length>1?` <span style="font-weight:400;color:#5b6b7a">(${g.segs.length} sections)</span>`:''}</dd><dt>Direction</dt><dd>↓ ${g.top.toLocaleString('en')} m → ${g.bot.toLocaleString('en')} m</dd><dt>Vertical</dt><dd>${(g.top-g.bot).toLocaleString('en')} m</dd>${g.segs.some(s=>s.s)?'<dt>Also</dt><dd>Toboggan use</dd>':''}</dl>
   <div style="margin-top:10px;font-size:12px;font-weight:600">Sun through the day <span style="font-weight:400;color:#5b6b7a" id="stripdate"></span></div><div class="sunstrip" id="strip"></div><div class="sunstrip-l">${[8,9,10,11,12,13,14,15,16,17].map(h=>`<span>${h}</span>`).join('')}</div>
   <canvas id="prof" width="560" height="140"></canvas><div style="font-size:11px;color:#5b6b7a">Elevation profile of the longest section</div>
-  ${g.c==='route'?'<div class="warn">Ski routes are marked but not groomed or patrolled.</div>':''}</div>`);
+  ${g.c==='route'?'<div class="warn">Ski routes are marked but not groomed or patrolled.</div>':''}${TRK.days.length?`<div class="newnote${g.st===2?'':' uc'}" style="margin-top:8px">${g.st===2?'✓ You\'ve boarded this piste':g.st===1?`You\'ve boarded about ${Math.round(g.cov*100)}% of it`:'Not boarded yet: one to discover!'}</div>`:''}<div class="acts"><button data-a="route" data-k="pt:${(()=>{const s=g.segs.reduce((a,c)=>a.l>c.l?a:c);return s.p[0][0]+','+s.p[0][1]})()}" class="pri">🧭 Route to the start</button></div></div>`);
   drawProfile(longest);state.selGroup=g;drawStrip(g);
 }
 function drawStrip(g){const el=document.getElementById('strip');if(!el)return;const ds=sunState.date;document.getElementById('stripdate').textContent='('+new Date(ds+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})+')';
@@ -1208,10 +1227,10 @@ function selectHut(h,fly){clearSel();state.sel='h:'+h.i;const el=hutMarkers[h.i]
 }
 
 // --- panel
-const chipDefs=[['blue','Blue','sw',COL.blue],['red','Red','sw',COL.red],['black','Black','sw',COL.black],['route','Ski routes','sw',COL.route],['cable','Gondolas','sw','#2d3238'],['chair','Chairlifts','sw','#2d3238'],['drag','Drag lifts','sw','#8a9099'],['huts','Restaurants','dot','#7a3e9d'],['arrows','Direction arrows','dot','#2d3238'],['weather','Weather on map','dot','#4aa3df'],['relief','Terrain','dot','#a3b5a0'],['labels','Labels','dot','#9aa6b2']];
+const chipDefs=[['blue','Blue','sw',COL.blue],['red','Red','sw',COL.red],['black','Black','sw',COL.black],['route','Ski routes','sw',COL.route],['cable','Gondolas','sw','#2d3238'],['chair','Chairlifts','sw','#2d3238'],['drag','Drag lifts','sw','#8a9099'],['huts','Restaurants','dot','#7a3e9d'],['arrows','Direction arrows','dot','#2d3238'],['weather','Weather on map','dot','#4aa3df'],['relief','Terrain','dot','#a3b5a0'],['mytracks','My tracks','dot','#7a3e9d'],['labels','Labels','dot','#9aa6b2']];
 const chips=document.getElementById('chips');
 chipDefs.forEach(([k,t,cls,c])=>{const b=document.createElement('button');b.className='chip';b.innerHTML=`<span class="${cls}" style="background:${c}"></span>${t}`;b.onclick=()=>{state.show[k]=state.show[k]?0:1;b.classList.toggle('off',!state.show[k]);render()};chips.appendChild(b)});
-document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x===b));state.mode=b.dataset.m;document.getElementById('sunbox').classList.toggle('on',state.mode==='sun');if(state.mode!=='sun')stopPlay();updateSunUI();render();refreshCard()});
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);if(b.dataset.m==='mine'){setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}});
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{setTab(b.dataset.t);if(isMobile()&&sheetState()==='peek')sheet('half');scrollToTabs()});
 document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();autoTab();buildList()});
 // ===== mobile bottom sheet =====
@@ -1245,10 +1264,11 @@ function buildList(){const q=state.q,el=document.getElementById('list');let h=''
       xs.forEach(x=>h+=`<div class="item" data-k="h:${x.i}"><div class="ic hutic">${HUT_SVG}</div><div><div class="t">${x.n}</div><div class="s">${x.area} · ${x.e.toLocaleString('en')} m${x.offpiste?' · off-piste':''}</div></div></div>`)});}
   if(state.tab==='lifts'){[['new','New & under construction'],['cable','Gondolas & cable cars'],['chair','Chairlifts'],['drag','Drag lifts & carpets']].forEach(([g,t])=>{const xs=g==='new'?ls.filter(x=>x.news):ls.filter(x=>x.grp===g&&!x.uc);if(!xs.length)return;h+=`<div class="group">${t}</div>`;
       xs.forEach(x=>h+=`<div class="item" data-k="l:${x.i}"><div class="ic"><span class="badge b-lift" style="${x.uc?'background:#8a95a1':x.news?'background:#12a150':''}">${x.ref||'·'}</span></div><div><div class="t">${x.n}${x.uc?'<span class="newb uc">2027/28</span>':x.news?`<span class="newb">${x.upd?'UPDATED':'NEW'}</span>`:''}</div><div class="s">${x.tl}${x.occ?' · '+x.occ+'-seater':''} · ${x.b.toLocaleString('en')} → ${x.top.toLocaleString('en')} m</div></div></div>`)});}
-  if(state.tab==='runs'){rs.forEach(g=>h+=`<div class="item" data-k="r:${g.key}"><div class="ic"><span class="badge b-${g.c}">${g.n}</span></div><div><div class="t">Piste ${g.n}</div><div class="s">${DIFFNAME[g.c].split(' (')[0]} · ${fmtLen(g.len)} · ${g.top.toLocaleString('en')} → ${g.bot.toLocaleString('en')} m</div></div></div>`)}
+  if(state.tab==='runs'){h+=trkImportBox();let list=rs;if(TRK.days.length){h+=progressHTML();list=trkFilter==='todo'?rs.filter(g=>g.st!==2):trkFilter==='done'?rs.filter(g=>g.st===2):rs}
+    list.forEach(g=>h+=`<div class="item" data-k="r:${g.key}"><div class="ic"><span class="badge b-${g.c}">${g.n}</span></div><div style="flex:1"><div class="t">Piste ${g.n}${TRK.days.length?(g.st===2?' <span class="done">✓</span>':g.st===1?` <span class="half">${Math.round(g.cov*100)}%</span>`:''):''}</div><div class="s">${DIFFNAME[g.c].split(' (')[0]} · ${fmtLen(g.len)} · ${g.top.toLocaleString('en')} → ${g.bot.toLocaleString('en')} m</div></div></div>`)}
   if(!h)h='<div class="note">Nothing matches that search.</div>';
   h+=`<div class="note">Pistes and lifts come from OpenStreetMap (via OpenSkiMap / OpenSkiStats), so mapped lengths differ from the resort's official 239 km figure. Restaurant locations from the official Ischgl/Samnaun listings. Check <a href="https://www.ischgl.com">ischgl.com</a> for live lift and piste status.</div>`;
-  el.innerHTML=h;
+  el.innerHTML=h;if(state.tab==='runs')wireImport(el);
   el.querySelectorAll('.item').forEach(it=>it.onclick=()=>{const [t,...rest]=it.dataset.k.split(':');const v=rest.join(':');
     if(isMobile()){sheet('peek');document.getElementById('q').blur()}if(t==='h')selectHut(DATA.huts[+v],true);if(t==='l')selectLift(DATA.lifts[+v],true);if(t==='r')selectRun(runGroups[v],true);
     if(window.innerWidth<=760){/* keep list visible */}});
@@ -1519,7 +1539,7 @@ map.on('contextmenu',e=>{const ll=[e.latlng.lat,e.latlng.lng];const nm=nearestNa
 // action buttons inside hut / lift cards
 function cardActions(kind,id,ll){return `<div class="acts"><button data-a="route" data-k="${kind}:${id}" class="pri">🧭 Route here</button><button data-a="meet" data-ll="${ll.join(',')}">🚩 Meet here</button></div>`}
 document.getElementById('card').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;
-  if(b.dataset.k&&b.dataset.a==='route'){routeTo(b.dataset.k)}
+  if(b.dataset.k&&b.dataset.a==='route'){if(b.dataset.k.startsWith('pt:'))R.pt=b.dataset.k.slice(3).split(',').map(Number);routeTo(b.dataset.k)}
   if(b.dataset.ll&&b.dataset.a==='meet'){const ll=b.dataset.ll.split(',').map(Number);const nm=state.sel&&state.sel.startsWith('h:')?DATA.huts[+state.sel.slice(2)].n:nearestName(ll);meetSet(ll,nm)}});
 
 // ===================== EMERGENCY / SOS =====================
@@ -1549,6 +1569,84 @@ sosCtl.addTo(map);
 
 // taps, drags and scrolls inside the info card / GPS bar must not reach the map (a map tap closes the card)
 ['card','gpsbar'].forEach(id=>{const el=document.getElementById(id);L.DomEvent.disableClickPropagation(el);L.DomEvent.disableScrollPropagation(el)});
+
+// ===================== MY TRACKS (Ski Tracks GPX/KML import) =====================
+const TRK={days:[],cov:null,runFrac:null,liftRides:null,on:false};
+function parseTrackFile(text,name){const doc=new DOMParser().parseFromString(text,'application/xml');let pts=[];
+  const tp=doc.getElementsByTagName('trkpt');
+  if(tp.length){for(const p of tp){const e=p.getElementsByTagName('ele')[0],t=p.getElementsByTagName('time')[0];pts.push([+p.getAttribute('lat'),+p.getAttribute('lon'),e?+e.textContent:NaN,t?Date.parse(t.textContent):NaN])}}
+  else{// KML: <when> + <gx:coord> pairs, or plain <coordinates>
+    const coords=doc.getElementsByTagNameNS('*','coord'),whens=doc.getElementsByTagName('when');
+    if(coords.length){for(let i=0;i<coords.length;i++){const [lo,la,el]=coords[i].textContent.trim().split(/\s+/).map(Number);pts.push([la,lo,el,whens[i]?Date.parse(whens[i].textContent):NaN])}}
+    else{for(const c of doc.getElementsByTagName('coordinates'))c.textContent.trim().split(/\s+/).forEach(s=>{const [lo,la,el]=s.split(',').map(Number);if(!isNaN(la))pts.push([la,lo,el,NaN])})}}
+  pts=pts.filter(p=>!isNaN(p[0])&&!isNaN(p[1]));if(pts.length<20)throw new Error('No track points found in '+name);
+  const nm=(doc.getElementsByTagName('name')[0]||{}).textContent||'';
+  return {file:name,name:nm,date:isNaN(pts[0][3])?null:new Date(pts[0][3]).toISOString().slice(0,10),pts}}
+// label each point: 1 = going up (lift), -1 = going down, 0 = flat
+function labelPts(pts){const n=pts.length,lab=new Int8Array(n),K=4;
+  for(let i=0;i<n;i++){const a=pts[Math.max(0,i-K)],b=pts[Math.min(n-1,i+K)];const dz=b[2]-a[2];const dt=(b[3]-a[3])/1000||((Math.min(n-1,i+K)-Math.max(0,i-K))*4);
+    const dh=mdist(a,b);lab[i]=dz>12&&dz/Math.max(dh,1)>0.08?1:dz<-6?-1:0}
+  return lab}
+let PN=null;// piste nodes index (densified 15 m)
+function pisteIndex(){if(PN)return PN;const nodes=[],grid=new Map(),CS=0.0004;
+  DATA.runs.forEach((r,ri)=>{for(let k=0;k<r.p.length-1;k++){const a=r.p[k],b=r.p[k+1],d=mdist(a,b),n=Math.max(1,Math.ceil(d/15));
+    for(let s=0;s<n;s++){const f=(s+.5)/n;const id=nodes.length;nodes.push({ri,lat:a[0]+(b[0]-a[0])*f,lon:a[1]+(b[1]-a[1])*f,len:d/n,hit:0});const gk=Math.floor(nodes[id].lat/CS)+':'+Math.floor(nodes[id].lon/CS);(grid.get(gk)||grid.set(gk,[]).get(gk)).push(id)}}});
+  PN={nodes,grid,CS};return PN}
+function nearNodes(lat,lon,R){const {grid,CS,nodes}=PN;const gy=Math.floor(lat/CS),gx=Math.floor(lon/CS),out=[];
+  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const c=grid.get((gy+dy)+':'+(gx+dx));if(!c)continue;for(const id of c){const n=nodes[id];const d=mdist([lat,lon],[n.lat,n.lon]);if(d<=R)out.push([id,d])}}return out}
+function analyse(){pisteIndex();PN.nodes.forEach(n=>n.hit=0);const rides=new Map();const R=30;
+  TRK.days.forEach(day=>{const p=day.pts,lab=labelPts(p);let down=0,vert=0,top=0,ups=[];let cur=null;
+    for(let i=0;i<p.length;i++){
+      if(lab[i]===1){if(!cur)cur=[];cur.push(p[i]);continue}
+      if(cur){if(cur.length>=4&&cur[cur.length-1][2]-cur[0][2]>40)ups.push(cur);cur=null}
+      if(i>0&&lab[i]<=0&&lab[i-1]<=0){const a=p[i-1],b=p[i],d=mdist(a,b);if(d>250)continue;
+        if(lab[i]===-1){down+=d;vert+=Math.max(0,a[2]-b[2]);const dt=(b[3]-a[3])/1000;if(dt>0.5){const v=d/dt*3.6;if(v<110&&v>top)top=v}}
+        // densify and match to the single nearest piste (avoids crediting parallel pistes)
+        const n=Math.max(1,Math.ceil(d/8));for(let s=0;s<=n;s++){const f=s/n,la=a[0]+(b[0]-a[0])*f,lo=a[1]+(b[1]-a[1])*f;const near=nearNodes(la,lo,R);if(!near.length)continue;
+          let best=near[0];near.forEach(x=>{if(x[1]<best[1])best=x});const ri=PN.nodes[best[0]].ri;near.forEach(([id,dd])=>{if(PN.nodes[id].ri===ri&&dd<=22)PN.nodes[id].hit=1})}}}
+    if(cur&&cur.length>=4&&cur[cur.length-1][2]-cur[0][2]>40)ups.push(cur);
+    // assign each ascent to the lift whose line it follows best
+    let nl=0;ups.forEach(u=>{let best=null,bd=1e9;DATA.lifts.forEach((l,li)=>{if(l.uc)return;let s=0;const step=Math.max(1,Math.floor(u.length/12));let c=0;
+        for(let j=0;j<u.length;j+=step){let m=1e9;for(let k=0;k<l.p.length-1;k++){m=Math.min(m,segDist(u[j],l.p[k],l.p[k+1]).d)}s+=m;c++}
+        const md=s/c;if(md<bd){bd=md;best=li}});
+      if(best!=null&&bd<70){rides.set(best,(rides.get(best)||0)+1);nl++}});
+    day.stats={down,vert,top,lifts:nl,ascents:ups.length}});
+  const frac=new Map();PN.nodes.forEach(n=>{const f=frac.get(n.ri)||[0,0];f[1]+=n.len;if(n.hit)f[0]+=n.len;frac.set(n.ri,f)});
+  TRK.runFrac=frac;TRK.liftRides=rides;
+  Object.values(runGroups).forEach(g=>{let h=0,t=0;g.segs.forEach(s=>{const f=frac.get(s.i)||[0,0];h+=f[0];t+=f[1]});g.cov=t?h/t:0;g.st=g.cov>=0.6?2:g.cov>=0.2?1:0})}
+function trkSave(){try{localStorage.setItem('ischgl-tracks',JSON.stringify(TRK.days.map(d=>({file:d.file,name:d.name,date:d.date,p:d.pts.map(q=>[Math.round(q[0]*1e5),Math.round(q[1]*1e5),Math.round(q[2]),Math.round((q[3]||0)/1000)])}))))}catch(e){trkMsg('Your phone ran out of storage space for tracks. They work for now but won\'t be remembered.')}}
+function trkLoad(){try{const a=JSON.parse(localStorage.getItem('ischgl-tracks')||'null');if(!a||!a.length)return;TRK.days=a.map(d=>({file:d.file,name:d.name,date:d.date,pts:d.p.map(q=>[q[0]/1e5,q[1]/1e5,q[2],q[3]*1000])}));analyse()}catch(e){}}
+let trkNote='';function trkMsg(m){trkNote=m;if(state.tab==='runs')buildList()}
+async function trkImport(files){let added=0,skipped=0,errs=[];for(const f of files){try{const d=parseTrackFile(await f.text(),f.name);
+      if(TRK.days.some(x=>x.date===d.date&&x.pts.length===d.pts.length)){skipped++;continue}TRK.days.push(d);added++}catch(e){errs.push(f.name)}}
+  TRK.days.sort((a,b)=>(a.date||'').localeCompare(b.date||''));analyse();trkSave();
+  trkNote=`${added} day${added===1?'':'s'} imported${skipped?`, ${skipped} already there`:''}${errs.length?`. Couldn't read: ${errs.join(', ')}`:''}.`;
+  if(added&&state.mode!=='mine')setMode('mine');else{render();buildList()}}
+function setMode(m){document.querySelectorAll('#mode button').forEach(x=>x.classList.toggle('on',x.dataset.m===m));state.mode=m;document.getElementById('sunbox').classList.toggle('on',m==='sun');if(m!=='sun')stopPlay();updateSunUI();render();refreshCard();buildList()}
+const trkLayer=L.layerGroup();
+function drawTracks(){trkLayer.clearLayers();if(state.mode!=='mine'||!state.show.mytracks||!TRK.days.length){map.removeLayer(trkLayer);return}
+  TRK.days.forEach(d=>{const ll=[];for(let i=0;i<d.pts.length;i+=2)ll.push([d.pts[i][0],d.pts[i][1]]);L.polyline(ll,{renderer:canvas,color:'#7a3e9d',weight:1.6,opacity:.55,interactive:false}).addTo(trkLayer)});
+  if(!map.hasLayer(trkLayer))trkLayer.addTo(map)}
+function progressHTML(){const gs=groupsSorted;const by={blue:[0,0],red:[0,0],black:[0,0],route:[0,0]};gs.forEach(g=>{by[g.c][1]++;if(g.st===2)by[g.c][0]++});
+  const done=gs.filter(g=>g.st===2).length,part=gs.filter(g=>g.st===1).length;
+  const lifts=DATA.lifts.filter(l=>!l.uc&&l.t!=='magic_carpet'),lr=lifts.filter(l=>TRK.liftRides&&TRK.liftRides.get(l.i)).length;
+  const tot=TRK.days.reduce((a,d)=>({down:a.down+d.stats.down,vert:a.vert+d.stats.vert,rides:a.rides+d.stats.lifts,top:Math.max(a.top,d.stats.top)}),{down:0,vert:0,rides:0,top:0});
+  const bar=(c,lab)=>{const [a,b]=by[c];return b?`<div class="pbar"><span class="pl">${lab}</span><div class="pt"><div style="width:${Math.round(100*a/b)}%;background:${COL[c]}"></div></div><span class="pn">${a}/${b}</span></div>`:''};
+  return `<div class="mine"><div class="mbig"><b>${done}</b> of ${gs.length} pistes boarded${part?` <span>· ${part} partly</span>`:''}</div>
+   ${bar('blue','Blue')}${bar('red','Red')}${bar('black','Black')}${bar('route','Routes')}
+   <div class="mstats"><div><b>${TRK.days.length}</b><span>days</span></div><div><b>${(tot.down/1000).toFixed(0)} km</b><span>downhill</span></div><div><b>${Math.round(tot.vert/1000).toLocaleString('en')}k m</b><span>vertical</span></div><div><b>${tot.rides}</b><span>lift rides</span></div></div>
+   <div class="msub">${lr} of ${lifts.length} lifts ridden · top speed ${Math.round(tot.top)} km/h</div>
+   <div class="mfil" id="mfil"><button data-f="todo">To discover</button><button data-f="done">Boarded</button><button data-f="all">All</button></div></div>`}
+let trkFilter='todo';
+function trkImportBox(){return `<div class="mimp"><label class="mbtn">${TRK.days.length?'+ Add more days':'Import Ski Tracks files'}<input type="file" id="trkfile" accept=".gpx,.kml,application/gpx+xml,application/vnd.google-earth.kml+xml,application/xml,text/xml" multiple hidden></label>
+  ${TRK.days.length?`<button class="mclr" id="trkclr">Remove all</button>`:''}</div>
+  ${trkNote?`<div class="mnote">${trkNote}</div>`:''}
+  ${TRK.days.length?'':`<div class="note" style="padding-top:2px">Export your days from Ski Tracks as GPX (or KML) and pick them here. Everything stays on this device; nothing is uploaded.</div>`}`}
+function wireImport(el){const f=el.querySelector('#trkfile');if(f)f.onchange=e=>{if(e.target.files.length)trkImport([...e.target.files]);e.target.value=''};
+  const c=el.querySelector('#trkclr');if(c)c.onclick=()=>{if(c.dataset.sure){TRK.days=[];TRK.runFrac=null;TRK.liftRides=null;Object.values(runGroups).forEach(g=>{g.cov=0;g.st=0});trkSave();trkNote='All tracks removed.';render();buildList()}else{c.dataset.sure=1;c.textContent='Tap again to remove'}};
+  el.querySelectorAll('#mfil button').forEach(b=>{b.classList.toggle('on',b.dataset.f===trkFilter);b.onclick=()=>{trkFilter=b.dataset.f;buildList()}})}
+function mineStyle(o,w){const g=o.r.g,st=g&&g.st||0;if(!TRK.days.length)return {color:COL[o.r.c],weight:w,opacity:1};
+  return st===2?{color:COL[o.r.c],weight:w+.6,opacity:1}:st===1?{color:COL[o.r.c],weight:w,opacity:.55,dashArray:'7 6'}:{color:'#9aa6b2',weight:Math.max(1.6,w-1.2),opacity:.75,dashArray:o.r.c==='route'?'6 6':null}}
 
 
 // ===== sun UI =====
@@ -1582,7 +1680,7 @@ const all=L.latLngBounds(DATA.runs.flatMap(r=>r.p.map(p=>[p[0],p[1]])));
 map.fitBounds(all,isMobile()?{paddingTopLeft:[8,70],paddingBottomRight:[8,125]}:{padding:[20,20]});
 map.setMaxBounds(all.pad(0.6));
 render();buildList();
-meetDraw();meetFromHash();if(GPS)wxLoad();
+trkLoad();meetDraw();meetFromHash();if(GPS)wxLoad();
 </script>
 </body>
 </html>
