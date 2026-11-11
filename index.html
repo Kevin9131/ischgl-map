@@ -1142,11 +1142,12 @@ function render(){
   // casings first, then lines (black on top)
   const order={blue:0,route:1,red:2,black:3};
   const vis=runLayers.filter(o=>state.show[o.r.c]).sort((a,b)=>order[a.r.c]-order[b.r.c]);
-  vis.forEach(o=>{const dn=state.mode==='mine'&&TRK.days.length&&o.r.g&&o.r.g.st===2;o.casing.setStyle({weight:dn?w+8:w+3.5,color:dn?'#2bd46a':'#fff',opacity:dn?.85:.9});runLayerGroup.addLayer(o.casing)});
+  vis.forEach(o=>{o.casing.setStyle({weight:w+3.5,color:'#fff',opacity:.9});runLayerGroup.addLayer(o.casing)});
   liftLayers.forEach(o=>{if(state.show[o.l.grp])runLayerGroup.addLayer(o.casing)});
   const sun=state.mode==='sun'?sunNow():null;
   const mine=state.mode==='mine';const visO=mine?[...vis].sort((a,b)=>((a.r.g&&a.r.g.st)||0)-((b.r.g&&b.r.g.st)||0)):vis;
   if(mine)visO.forEach(o=>{o.line.setStyle(Object.assign({dashArray:o.r.c==='route'?'6 6':null},mineStyle(o,w)));runLayerGroup.addLayer(o.line)});
+  if(mine&&typeof drawStretches==='function')drawStretches(w);
   else vis.forEach(o=>{if(state.mode==='diff'){const cl=liveClosedRun(o.r);o.line.setStyle({weight:cl?Math.max(1.6,w-1.2):w,color:COL[o.r.c],opacity:cl?.3:.95,dashArray:cl?'2 6':o.r.c==='route'?'6 6':null});runLayerGroup.addLayer(o.line)}else{o.el.forEach((s,k)=>{const st={weight:w+.3};if(sun){st.color=scol(insol(sun,o.r.geo[k]))}else st.color=ecol((o.r.p[k][2]+o.r.p[k+1][2])/2);s.setStyle(st);runLayerGroup.addLayer(s)})}});
   liftLayers.forEach(o=>{if(!state.show[o.l.grp])return;const ridden=!mine||!TRK.days.length||o.l.uc||(TRK.liftRides&&TRK.liftRides.get(o.l.i));const lc=liveClosedLift(o.l);o.line.setStyle({opacity:lc?.22:ridden?(o.l.uc?.85:1):.3,color:lc?'#b03a2e':o.l.uc?'#8a95a1':'#2d3238'});runLayerGroup.addLayer(o.line);if(!ridden||lc)return;if(o.flow&&state.show.arrows&&z>=12.5)runLayerGroup.addLayer(o.flow);if(z>=13.5||o.l.grp!=='drag'){runLayerGroup.addLayer(o.a);runLayerGroup.addLayer(o.b)}if(o.ref&&z>=13.75)runLayerGroup.addLayer(o.ref)});
   // numbers
@@ -1168,7 +1169,7 @@ map.on('zoomend',render);
 const legend=L.control({position:'bottomright'});
 legend.onAdd=function(){this.div=L.DomUtil.create('div','legend');return this.div};
 legend.update=function(){if(!this.div)return;
-  if(state.mode==='mine'){this.div.innerHTML=TRK.days.length?`<div class="r"><span class="ln" style="background:#e0312b"></span>Boarded</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,#e0312b 0 6px,transparent 6px 10px);opacity:.6"></span>Partly boarded</div><div class="r"><span class="ln" style="background:#9aa6b2"></span>Still to discover</div><div class="r"><span class="ln" style="background:#7a3e9d;height:2px"></span>Your tracks</div><div class="r"><span class="ln" style="background:#2d3238;opacity:.3"></span>Lift not ridden yet</div>`:'<b>My pistes</b><br>Import your Ski Tracks files<br>in the Pistes tab';return}
+  if(state.mode==='mine'){this.div.innerHTML=TRK.days.length?`<div class="r"><span class="ln" style="background:#e0312b;box-shadow:0 0 0 3px #2bd46a"></span>Where you boarded</div><div class="r"><span class="ln" style="background:#9aa6b2"></span>Still to discover</div><div class="r"><span class="ln" style="background:#7a3e9d;height:2px"></span>Your tracks</div><div class="r"><span class="ln" style="background:#2d3238;opacity:.3"></span>Lift not ridden yet</div>`:'<b>My pistes</b><br>Import your Ski Tracks files<br>in the Pistes tab';return}
   if(state.mode==='sun'){this.div.innerHTML=`<b>Sun on the slope · ${fmtT(sunState.mins)}</b><div class="elev-bar" style="background:linear-gradient(90deg,rgb(70,84,122) 0%,rgb(118,126,150) 4%,rgb(255,240,170) 7%,rgb(255,205,70) 25%,rgb(255,140,20) 50%,rgb(220,70,0) 80%,rgb(200,50,0))"></div><div class="elev-lab"><span>Shade</span><span>Weak</span><span>Full sun</span></div>`;return}
   this.div.innerHTML=state.mode==='diff'
    ?`<div class="r"><span class="ln" style="background:${COL.blue}"></span>Easy</div><div class="r"><span class="ln" style="background:${COL.red}"></span>Intermediate</div><div class="r"><span class="ln" style="background:${COL.black}"></span>Difficult</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,${COL.route} 0 5px,transparent 5px 9px)"></span>Ski route</div><div class="r"><span class="ln" style="background:#2d3238;height:3px"></span>Lift</div><div class="r"><svg width="22" height="18" viewBox="-11 -9 22 18" style="transform:rotate(90deg)"><path d="M0 -8 L6 5 L0 1.8 L-6 5 Z" fill="#15202b" stroke="#fff" stroke-width="1.5"/></svg>Lift direction (uphill)</div><div class="r"><span class="ln" style="background:repeating-linear-gradient(90deg,#8a95a1 0 6px,transparent 6px 10px)"></span>Under construction</div><div class="r"><svg width="22" height="16" viewBox="-11 -8 22 16"><circle cx="-6" r="3.3" fill="#fff" stroke="#2d3238" stroke-width="2"/><circle cx="6" r="4" fill="#2d3238"/></svg>Valley ○ · ● Top station</div><div class="r"><svg width="22" height="16" viewBox="-11 -8 22 16"><path d="M-5 -1 L0 4 L5 -1" fill="none" stroke="#e0312b" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Piste direction (downhill)</div>`
@@ -1605,20 +1606,22 @@ function labelPts(pts){const n=pts.length,lab=new Int8Array(n),K=4;
 let PN=null;// piste nodes index (densified 15 m)
 function pisteIndex(){if(PN)return PN;const nodes=[],grid=new Map(),CS=0.0004;
   DATA.runs.forEach((r,ri)=>{for(let k=0;k<r.p.length-1;k++){const a=r.p[k],b=r.p[k+1],d=mdist(a,b),n=Math.max(1,Math.ceil(d/15));
-    for(let s=0;s<n;s++){const f=(s+.5)/n;const id=nodes.length;nodes.push({ri,lat:a[0]+(b[0]-a[0])*f,lon:a[1]+(b[1]-a[1])*f,len:d/n,hit:0});const gk=Math.floor(nodes[id].lat/CS)+':'+Math.floor(nodes[id].lon/CS);(grid.get(gk)||grid.set(gk,[]).get(gk)).push(id)}}});
+    for(let s=0;s<n;s++){const f=(s+.5)/n;const id=nodes.length;nodes.push({ri,k,lat:a[0]+(b[0]-a[0])*f,lon:a[1]+(b[1]-a[1])*f,len:d/n,hit:0});const gk=Math.floor(nodes[id].lat/CS)+':'+Math.floor(nodes[id].lon/CS);(grid.get(gk)||grid.set(gk,[]).get(gk)).push(id)}}});
   PN={nodes,grid,CS};return PN}
-function nearNodes(lat,lon,R){const {grid,CS,nodes}=PN;const gy=Math.floor(lat/CS),gx=Math.floor(lon/CS),out=[];
-  for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const c=grid.get((gy+dy)+':'+(gx+dx));if(!c)continue;for(const id of c){const n=nodes[id];const d=mdist([lat,lon],[n.lat,n.lon]);if(d<=R)out.push([id,d])}}return out}
-function analyse(){pisteIndex();PN.nodes.forEach(n=>n.hit=0);const rides=new Map();const R=30;
-  TRK.days.forEach(day=>{const p=day.pts,lab=labelPts(p);let down=0,vert=0,top=0,ups=[];let cur=null;
+function nearNodes(lat,lon,R){const {grid,CS,nodes}=PN;const gy=Math.floor(lat/CS),gx=Math.floor(lon/CS),out=[],sy=Math.ceil(R/44),sx=Math.ceil(R/30);
+  for(let dy=-sy;dy<=sy;dy++)for(let dx=-sx;dx<=sx;dx++){const c=grid.get((gy+dy)+':'+(gx+dx));if(!c)continue;for(const id of c){const n=nodes[id];const d=mdist([lat,lon],[n.lat,n.lon]);if(d<=R)out.push([id,d])}}return out}
+function analyse(){pisteIndex();PN.nodes.forEach(n=>n.hit=0);const rides=new Map();const R=40;
+  TRK.days.forEach(day=>{const p=day.pts,lab=labelPts(p);let down=0,vert=0,top=0,ups=[];let cur=null,on=null;
     for(let i=0;i<p.length;i++){
-      if(lab[i]===1){if(!cur)cur=[];cur.push(p[i]);continue}
+      if(lab[i]===1){on=null;if(!cur)cur=[];cur.push(p[i]);continue}
       if(cur){if(cur.length>=4&&cur[cur.length-1][2]-cur[0][2]>40)ups.push(cur);cur=null}
       if(i>0&&lab[i]<=0&&lab[i-1]<=0){const a=p[i-1],b=p[i],d=mdist(a,b);if(d>250)continue;
         if(lab[i]===-1){down+=d;vert+=Math.max(0,a[2]-b[2]);const dt=(b[3]-a[3])/1000;if(dt>0.5){const v=d/dt*3.6;if(v<110&&v>top)top=v}}
         // densify and match to the single nearest piste (avoids crediting parallel pistes)
-        const n=Math.max(1,Math.ceil(d/8));for(let s=0;s<=n;s++){const f=s/n,la=a[0]+(b[0]-a[0])*f,lo=a[1]+(b[1]-a[1])*f;const near=nearNodes(la,lo,R);if(!near.length)continue;
-          let best=near[0];near.forEach(x=>{if(x[1]<best[1])best=x});const ri=PN.nodes[best[0]].ri;near.forEach(([id,dd])=>{if(PN.nodes[id].ri===ri&&dd<=22)PN.nodes[id].hit=1})}}}
+        const n=Math.max(1,Math.ceil(d/8));for(let s=0;s<=n;s++){const f=s/n,la=a[0]+(b[0]-a[0])*f,lo=a[1]+(b[1]-a[1])*f;const near=nearNodes(la,lo,R);
+          // GPS drifted off the mapped line: keep following the piste you were on (up to 90 m away)
+          if(!near.length){if(on==null)continue;const f2=nearNodes(la,lo,90).filter(x=>PN.nodes[x[0]].ri===on);if(!f2.length){on=null;continue}let b2=f2[0];f2.forEach(x=>{if(x[1]<b2[1])b2=x});PN.nodes[b2[0]].hit=1;continue}
+          let best=near[0];near.forEach(x=>{if(x[1]<best[1])best=x});const ri=PN.nodes[best[0]].ri;on=ri;const lim=Math.max(22,best[1]+8);PN.nodes[best[0]].hit=1;near.forEach(([id,dd])=>{if(PN.nodes[id].ri===ri&&dd<=lim)PN.nodes[id].hit=1})}}}
     if(cur&&cur.length>=4&&cur[cur.length-1][2]-cur[0][2]>40)ups.push(cur);
     // assign each ascent to the lift whose line it follows best
     let nl=0;ups.forEach(u=>{let best=null,bd=1e9;DATA.lifts.forEach((l,li)=>{if(l.uc)return;let s=0;const step=Math.max(1,Math.floor(u.length/12));let c=0;
@@ -1626,9 +1629,18 @@ function analyse(){pisteIndex();PN.nodes.forEach(n=>n.hit=0);const rides=new Map
         const md=s/c;if(md<bd){bd=md;best=li}});
       if(best!=null&&bd<70){rides.set(best,(rides.get(best)||0)+1);nl++}});
     day.stats={down,vert,top,lifts:nl,ascents:ups.length}});
+  // clean up: bridge short gaps, drop short touches (crossings), keep real skied stretches
+  const byRun=new Map();PN.nodes.forEach((n,id)=>{(byRun.get(n.ri)||byRun.set(n.ri,[]).get(n.ri)).push(id)});const str=[];
+  byRun.forEach((ids,ri)=>{const h=ids.map(id=>PN.nodes[id].hit);let last=-1;
+    for(let j=0;j<h.length;j++){if(!h[j])continue;if(last>=0&&j-last>1&&j-last<=5)for(let q=last+1;q<j;q++)h[q]=1;last=j}
+    const tot=ids.reduce((a,id)=>a+PN.nodes[id].len,0);let j=0;
+    while(j<h.length){if(!h[j]){PN.nodes[ids[j]].hit=0;j++;continue}let e=j,L=0;while(e<h.length&&h[e]){L+=PN.nodes[ids[e]].len;e++}
+      const keep=L>=100||(L>=0.5*tot&&L>=30);for(let q=j;q<e;q++)PN.nodes[ids[q]].hit=keep?1:0;
+      if(keep){const ll=[];for(let q=j;q<e;q++)ll.push([PN.nodes[ids[q]].lat,PN.nodes[ids[q]].lon]);str.push({ri,ll})}j=e}});
+  TRK.stretches=str;
   const frac=new Map();PN.nodes.forEach(n=>{const f=frac.get(n.ri)||[0,0];f[1]+=n.len;if(n.hit)f[0]+=n.len;frac.set(n.ri,f)});
   TRK.runFrac=frac;TRK.liftRides=rides;
-  Object.values(runGroups).forEach(g=>{let h=0,t=0;g.segs.forEach(s=>{const f=frac.get(s.i)||[0,0];h+=f[0];t+=f[1]});g.cov=t?h/t:0;g.st=g.cov>=0.6?2:g.cov>=0.2?1:0})}
+  Object.values(runGroups).forEach(g=>{let h=0,t=0;g.segs.forEach(s=>{const f=frac.get(s.i)||[0,0];h+=f[0];t+=f[1]});g.cov=t?h/t:0;g.st=g.cov>=0.5?2:h>=100?1:0})}
 function trkSave(){try{localStorage.setItem('ischgl-tracks',JSON.stringify(TRK.days.map(d=>({file:d.file,name:d.name,date:d.date,p:d.pts.map(q=>[Math.round(q[0]*1e5),Math.round(q[1]*1e5),Math.round(q[2]),Math.round((q[3]||0)/1000)])}))))}catch(e){trkMsg('Your phone ran out of storage space for tracks. They work for now but won\'t be remembered.')}}
 function trkLoad(){try{const a=JSON.parse(localStorage.getItem('ischgl-tracks')||'null');if(!a||!a.length)return;TRK.days=a.map(d=>({file:d.file,name:d.name,date:d.date,pts:d.p.map(q=>[q[0]/1e5,q[1]/1e5,q[2],q[3]*1000])}));analyse();if(localStorage.getItem('ischgl-mode')==='mine')setTimeout(()=>setMode('mine'),0)}catch(e){}}
 let trkNote='';function trkMsg(m){trkNote=m;if(state.tab==='runs')buildList()}
@@ -1661,11 +1673,14 @@ function wireImport(el){const f=el.querySelector('#trkfile');if(f)f.onchange=e=>
   const c=el.querySelector('#trkclr');if(c)c.onclick=()=>{if(c.dataset.sure){TRK.days=[];TRK.runFrac=null;TRK.liftRides=null;Object.values(runGroups).forEach(g=>{g.cov=0;g.st=0});trkSave();trkNote='All tracks removed.';render();buildList()}else{c.dataset.sure=1;c.textContent='Tap again to remove'}};
   el.querySelectorAll('#mfil button').forEach(b=>{b.classList.toggle('on',b.dataset.f===trkFilter);b.onclick=()=>{trkFilter=b.dataset.f;buildList()}})}
 function mineStyle(o,w){const g=o.r.g,st=g&&g.st||0;if(!TRK.days.length)return {color:COL[o.r.c],weight:w,opacity:1};
-  return st===2?{color:COL[o.r.c],weight:w+.6,opacity:1}:st===1?{color:COL[o.r.c],weight:w,opacity:.55,dashArray:'7 6'}:{color:'#9aa6b2',weight:Math.max(1.6,w-1.2),opacity:.75,dashArray:o.r.c==='route'?'6 6':null}}
+  return st===2?{color:COL[o.r.c],weight:w,opacity:.9}:{color:'#9aa6b2',weight:Math.max(1.6,w-1.2),opacity:.75,dashArray:o.r.c==='route'?'6 6':null}}
 
+function drawStretches(w){if(state.mode!=='mine'||!TRK.days.length||!TRK.stretches)return;
+  TRK.stretches.forEach(s=>{const r=DATA.runs[s.ri];if(!state.show[r.c])return;runLayerGroup.addLayer(L.polyline(s.ll,{renderer:canvas,color:'#2bd46a',weight:w+8,opacity:.9,lineCap:'round',interactive:false}))});
+  TRK.stretches.forEach(s=>{const r=DATA.runs[s.ri];if(!state.show[r.c])return;runLayerGroup.addLayer(L.polyline(s.ll,{renderer:canvas,color:COL[r.c],weight:w+.6,opacity:1,lineCap:'round',interactive:false}))})}
 function mineBanner(){const el=document.getElementById('minebar');if(!el)return;if(state.mode!=='mine'){el.style.display='none';return}
   if(!TRK.days.length){el.innerHTML='No tracks yet · <b style="color:#7a3e9d">tap to import your Ski Tracks files</b>'}
-  else{const d=groupsSorted.filter(g=>g.st===2).length;el.innerHTML=`<b>✓ ${d} of ${groupsSorted.length} boarded</b> · green = done · grey = still to discover`}
+  else{const d=groupsSorted.filter(g=>g.st===2).length;el.innerHTML=`<b>✓ ${d} of ${groupsSorted.length} boarded</b> · green = where you've been`}
   el.style.display='block';el.onclick=()=>{setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}}
 L.DomEvent.disableClickPropagation(document.getElementById('minebar'));
 // remember the Mine view when tracks exist
