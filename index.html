@@ -723,7 +723,7 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .note{font-size:11px;color:var(--muted);padding:10px 18px 14px;line-height:1.45}
 .note a{color:var(--muted)}
 /* info card */
-#card{position:absolute;right:14px;top:62px;width:300px;max-width:calc(100% - 28px);background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(20,32,43,.18);z-index:800;display:none;overflow:hidden}
+#card{position:absolute;right:14px;top:62px;width:300px;max-width:calc(100% - 28px);background:#fff;border-radius:12px;box-shadow:0 8px 30px rgba(20,32,43,.18);z-index:1001;display:none;overflow:hidden}
 #card .hd{padding:12px 14px 10px;display:flex;gap:10px;align-items:center;border-bottom:1px solid var(--line)}
 #card .hd h3{margin:0;font-size:15px;line-height:1.25}
 #card .hd .sub{font-size:12px;color:var(--muted)}
@@ -847,6 +847,17 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .wxb{position:absolute;left:0;top:0;transform:translate(-50%,-140%);background:#ffffffee;border-radius:999px;padding:2px 8px;font-size:11.5px;white-space:nowrap;box-shadow:0 1px 5px rgba(0,0,0,.25);cursor:pointer;width:max-content}
 .wxb.gust{background:#fff1dc;box-shadow:0 0 0 1.5px #f08a00,0 1px 5px rgba(0,0,0,.25)}
 @media (max-width:760px){.tabs button{font-size:13.5px;padding:12px 2px}.rt select{font-size:16px}}
+.sosbtn{width:48px;height:48px;border-radius:50%;border:3px solid #fff;background:#d61f1f;color:#fff;font:inherit;font-weight:900;font-size:13px;letter-spacing:.03em;box-shadow:0 2px 10px rgba(0,0,0,.3);cursor:pointer;margin-top:8px!important}
+.sosrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;background:#f4f6f8;margin-top:8px;text-decoration:none;color:var(--ink)}
+.sosrow.main{background:#fdecec;border:1.5px solid #f3b6b6}
+.sosrow b{display:block;font-size:14px;color:var(--ink)}.sosrow span{font-size:11.5px;color:var(--muted)}
+.sosnum{font-weight:800;font-size:15px;color:#c01818;white-space:nowrap}
+.sosgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.sosgrid a{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:10px;background:#f4f6f8;text-decoration:none;color:var(--ink);text-align:center}
+.sosgrid b{font-size:17px;color:#c01818}.sosgrid span{font-size:9.5px;line-height:1.2;color:var(--muted)}
+.soswhere{margin-top:10px;font-size:12.5px;padding-right:64px!important;background:#eef5fd;border-radius:8px;padding:8px 10px;line-height:1.45;position:relative}
+.soswhere button{position:absolute;right:8px;top:8px;border:1px solid var(--line);background:#fff;border-radius:6px;font:inherit;font-size:11.5px;padding:3px 8px;cursor:pointer}
+.sostip{margin-top:10px;font-size:11.5px;color:var(--muted);line-height:1.45}
 #toggle,#grab{display:none}
 /* GPS */
 .locbtn{width:34px;height:34px;background:#fff;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;padding:0}
@@ -901,7 +912,7 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
   .locbtn{width:42px;height:42px;border-radius:8px}
   .orient{padding:6px 9px}
   .compass{transform:scale(.85);transform-origin:top left}
-  #gpsbar{left:64px;right:10px;transform:none;max-width:none;top:calc(64px + env(safe-area-inset-top));font-size:12.5px}
+  #gpsbar{left:64px;right:66px;transform:none;max-width:none;top:calc(64px + env(safe-area-inset-top));font-size:12.5px}
   .leaflet-bottom{z-index:800}
 }
 </style>
@@ -1489,7 +1500,7 @@ function meetCard(){if(!MEET.cur)return;clearSel();const m=MEET.cur;state.sel='m
   <div class="bd"><div class="mf"><label>Name</label><input id="mname" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="e.g. Alpenhaus terrace"></div><div class="mf"><label>Time</label><input id="mtime" type="time" value="${m.time||''}"></div>
   <div class="acts"><button data-a="share" class="pri">${navigator.share&&GPS?'Share…':'Copy link'}</button><button data-a="route">🧭 Route here</button><button data-a="del">Remove</button></div><div id="mmsg" class="mmsg"></div></div>`);
   const c=document.getElementById('card');
-  c.querySelector('#mname').oninput=e=>{m.name=e.target.value;meetSave()};c.querySelector('#mtime').onchange=e=>{m.time=e.target.value;meetSave();meetDraw()};
+  c.querySelector('#mname').oninput=e=>{m.name=e.target.value;meetSave()};const setT=e=>{m.time=e.target.value;meetSave();meetDraw()};c.querySelector('#mtime').onchange=setT;c.querySelector('#mtime').oninput=setT;
   c.querySelector('[data-a=share]').onclick=async()=>{const url=meetLink(),txt=meetText();
     if(navigator.share&&GPS){try{await navigator.share({title:'Ischgl meeting point',text:txt,url});return}catch(e){if(e.name==='AbortError')return}}
     try{await navigator.clipboard.writeText(txt+' '+url);c.querySelector('#mmsg').textContent='Link copied. Paste it in your group chat.'}catch(e){c.querySelector('#mmsg').innerHTML=`Copy this link:<br><span class="sel">${url}</span>`}};
@@ -1510,6 +1521,34 @@ function cardActions(kind,id,ll){return `<div class="acts"><button data-a="route
 document.getElementById('card').addEventListener('click',e=>{const b=e.target.closest('button[data-a]');if(!b)return;
   if(b.dataset.k&&b.dataset.a==='route'){routeTo(b.dataset.k)}
   if(b.dataset.ll&&b.dataset.a==='meet'){const ll=b.dataset.ll.split(',').map(Number);const nm=state.sel&&state.sel.startsWith('h:')?DATA.huts[+state.sel.slice(2)].n:nearestName(ll);meetSet(ll,nm)}});
+
+// ===================== EMERGENCY / SOS =====================
+const SOS_NUM=[
+ {k:'ischgl',t:'Piste rescue Ischgl',s:'Austrian side (Ischgl, Idalp, Fimba valley)',n:'+43 5444 606 600',tel:'+435444606600',main:1},
+ {k:'samnaun',t:'Piste rescue Samnaun',s:'Swiss side (Samnaun, Alp Trida)',n:'+41 81 861 86 51',tel:'+41818618651',main:1},
+ {k:'112',t:'European emergency number',s:'Works in Austria & Switzerland, even without your own network',n:'112',tel:'112'},
+ {k:'140',t:'Mountain rescue Austria',s:'Alpine emergencies off-piste',n:'140',tel:'140'},
+ {k:'1414',t:'Rega air rescue Switzerland',s:'Helicopter / alpine rescue',n:'1414',tel:'1414'},
+ {k:'144',t:'Ambulance',s:'Same number in Austria and Switzerland',n:'144',tel:'144'}];
+function sosWhere(){if(!gps.ll)return null;const p=gps.ll;let best={d:1e9};DATA.runs.forEach(r=>{for(let k=0;k<r.p.length-1;k++){const s=segDist(p,r.p[k],r.p[k+1]);if(s.d<best.d)best={d:s.d,r}}});
+  let lift={d:1e9};DATA.lifts.forEach(l=>{if(l.uc||l.t==='magic_carpet')return;[l.p[0],l.p[l.p.length-1]].forEach((q,j)=>{const d=mdist(p,q);if(d<lift.d)lift={d,l,top:j===1}})});
+  const piste=best.d<60&&best.r?(best.r.n?'piste '+best.r.n:'an unnamed piste'):null;
+  const txt=`${p[0].toFixed(5)} N, ${p[1].toFixed(5)} E${gps.alt!=null?' · '+Math.round(gps.alt)+' m':''}${piste?' · on '+piste:''} · near ${lift.l.ref?lift.l.ref+' ':''}${lift.l.n} ${lift.top?'top':'valley'} station`;
+  return {txt,piste,lift}}
+function sosCard(){clearSel();state.sel='sos';const w=sosWhere();
+  const row=x=>`<a class="sosrow${x.main?' main':''}" href="tel:${x.tel}"><div><b>${x.t}</b><span>${x.s}</span></div><div class="sosnum">${x.n}</div></a>`;
+  card(`<div class="hd"><div class="hutic" style="background:#d61f1f;font-weight:900;color:#fff;font-size:11px">SOS</div><div><h3>Emergency numbers</h3><div class="sub">Tap a number to call</div></div><button class="x" aria-label="Close">×</button></div>
+  <div class="bd">${SOS_NUM.filter(x=>x.main).map(row).join('')}
+   <div class="sosgrid">${SOS_NUM.filter(x=>!x.main).map(x=>`<a href="tel:${x.tel}"><b>${x.n}</b><span>${x.t}</span></a>`).join('')}</div>
+   ${w?`<div class="soswhere"><b>Your position</b><br>${w.txt}<button id="soscopy">Copy</button></div>`:GPS?`<div class="soswhere">Tap the location button to show your exact position here, so you can read it out to the rescuers.</div>`:''}
+   <div class="sostip">When you call, give the <b>piste number</b>, the nearest lift and what happened. You can also report accidents at any lift station or mountain restaurant. Rescue from the piste costs about €300 / CHF 300 and isn't included in the ski pass, so check your insurance.</div></div>`);
+  const c=document.getElementById('soscopy');if(c)c.onclick=async()=>{try{await navigator.clipboard.writeText(w.txt);c.textContent='Copied'}catch(e){c.textContent='Select & copy'}}}
+const sosCtl=L.control({position:'topright'});
+sosCtl.onAdd=function(){const b=L.DomUtil.create('button','sosbtn');b.innerHTML='SOS';b.title='Emergency numbers';L.DomEvent.disableClickPropagation(b);b.onclick=sosCard;return b};
+sosCtl.addTo(map);
+
+// taps, drags and scrolls inside the info card / GPS bar must not reach the map (a map tap closes the card)
+['card','gpsbar'].forEach(id=>{const el=document.getElementById(id);L.DomEvent.disableClickPropagation(el);L.DomEvent.disableScrollPropagation(el)});
 
 
 // ===== sun UI =====
