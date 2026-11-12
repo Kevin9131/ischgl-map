@@ -939,6 +939,24 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
   .leaflet-bottom{z-index:800}
 }
 
+
+#sunfloat{display:none}
+.seasonrow{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11.5px;color:#8a7440}.seasonrow .presets{margin-top:0}
+html.dark .seasonrow{color:#d9c17f}
+#spresets{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#spresets::-webkit-scrollbar{display:none}#spresets button{flex:0 0 auto}
+@media (max-width:760px){
+  html.sunf #sunfloat{display:block;position:absolute;left:10px;right:10px;bottom:calc(126px + env(safe-area-inset-bottom));z-index:860;background:#fbf7ecf5;border:1px solid #f0e3bf;border-radius:14px;padding:8px 11px 9px;box-shadow:0 4px 16px rgba(20,32,43,.22)}
+  #sunfloat .sfh{display:flex;align-items:baseline;gap:8px;font-size:12.5px;margin-bottom:5px}
+  #sunfloat .sfh span{color:#8a7440;font-size:11.5px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #sunfloat .sfh a{color:#1a73e8;font-size:12px;cursor:pointer}
+  #sunfloat .presets{margin-top:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#sunfloat .presets::-webkit-scrollbar{display:none}
+  #sunfloat .presets button{flex:0 0 auto}
+  #sunfloat .sunrow{margin-top:6px!important}
+  html.sunf #card{bottom:calc(256px + env(safe-area-inset-bottom));max-height:42%}
+  html.sunf .leaflet-bottom{bottom:calc(250px + env(safe-area-inset-bottom))}
+  html.dark #sunfloat{background:#2a2414f5;border-color:#4a3e1c}
+  html.dark #sunfloat .sfh span{color:#d9c17f}html.dark #sunfloat .sfh a{color:#7fb3f0}
+}
 /* ===== dark mode ===== */
 html.dark{color-scheme:dark;--bg:#0f151b;--panel:#161d25;--ink:#e6ebf0;--muted:#93a1b0;--line:#2a3440;--accent:#5ea2ff;--lift:#4a5260;--black:#000;--s2:#1e2731}
 html.dark #map{background:#141b22}
@@ -1024,6 +1042,7 @@ html.dark .mmsg{color:#7fe0a8}
       <div id="sunbox">
         <div class="sunrow"><input type="date" id="sdate"><span style="font-size:11.5px;color:#8a7440" id="sdatelab"></span></div>
         <div class="presets" id="spresets"></div>
+        <div class="seasonrow"><span>Season:</span><div class="presets" id="sseason"></div></div>
         <div class="sunrow" style="margin-top:8px"><button id="play" title="Play the day">▶</button><span id="tlabel">11:00</span><input type="range" id="tslider" min="480" max="1050" step="15" value="660"></div>
         <div id="suninfo"></div>
         <div id="sunbest"></div>
@@ -1039,7 +1058,7 @@ html.dark .mmsg{color:#7fe0a8}
     </div>
     <div id="list"></div>
   </aside>
-  <div id="map" style="position:relative"><div id="card"></div><div id="gpsbar"></div><div id="minebar"></div></div>
+  <div id="map" style="position:relative"><div id="card"></div><div id="gpsbar"></div><div id="minebar"></div><div id="sunfloat"><div class="sfh"><b>☀ Sun &amp; shade</b><span id="sfdate"></span><a id="sfmore">Details</a></div></div></div>
 </div>
 <script>/* @preserve
  * Leaflet 1.9.4, a JS library for interactive maps. https://leafletjs.com
@@ -1312,7 +1331,7 @@ function selectHut(h,fly){clearSel();state.sel='h:'+h.i;const el=hutMarkers[h.i]
 const chipDefs=[['blue','Blue','sw',COL.blue],['red','Red','sw',COL.red],['black','Black','sw',COL.black],['route','Ski routes','sw',COL.route],['cable','Gondolas','sw','#2d3238'],['chair','Chairlifts','sw','#2d3238'],['drag','Drag lifts','sw','#8a9099'],['huts','Restaurants','dot','#7a3e9d'],['arrows','Direction arrows','dot','#2d3238'],['weather','Weather on map','dot','#4aa3df'],['live','Live status','dot','#12a150'],['relief','Terrain','dot','#a3b5a0'],['mytracks','My tracks','dot','#7a3e9d'],['labels','Labels','dot','#9aa6b2']];
 const chips=document.getElementById('chips');
 chipDefs.forEach(([k,t,cls,c])=>{const b=document.createElement('button');b.className='chip';b.dataset.k=k;b.innerHTML=`<span class="${cls}" style="background:${c}"></span>${t}`;b.onclick=()=>{state.show[k]=state.show[k]?0:1;b.classList.toggle('off',!state.show[k]);render()};chips.appendChild(b)});
-document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);if(b.dataset.m==='mine'){setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}});
+document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);if(b.dataset.m==='sun'&&isMobile())sheet('peek');if(b.dataset.m==='mine'){setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}});
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{setTab(b.dataset.t);if(isMobile()&&sheetState()==='peek')sheet('half');scrollToTabs()});
 document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();autoTab();buildList()});
 // ===== mobile bottom sheet =====
@@ -1331,6 +1350,20 @@ document.getElementById('q').addEventListener('focus',()=>sheet('full'));
   const m=document.getElementById('map');m.addEventListener('touchstart',drop,{passive:true});m.addEventListener('mousedown',drop);map.on('dragstart zoomstart',drop);
   ['tslider','sdate'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('change',()=>setTimeout(()=>el.blur(),50));el.addEventListener('touchend',()=>setTimeout(()=>el.blur(),50),{passive:true})}})})();
 if(isMobile())sheet('peek');
+// mobile: the sun time controls float over the map (not inside the scrolling panel), so the map stays free to drag
+const sunFloat={home:null};
+function sunFloatSync(){const on=isMobile()&&state.mode==='sun'&&sheetState()==='peek';document.documentElement.classList.toggle('sunf',on);
+  const f=document.getElementById('sunfloat'),pr=document.getElementById('spresets'),row=document.getElementById('tslider').parentNode;
+  if(!sunFloat.home)sunFloat.home={pr:[pr.parentNode,pr.nextSibling],row:[row.parentNode,row.nextSibling]};
+  if(on&&pr.parentNode!==f){f.appendChild(pr);f.appendChild(row)}
+  else if(!on&&pr.parentNode===f){sunFloat.home.pr[0].insertBefore(pr,sunFloat.home.pr[1]);sunFloat.home.row[0].insertBefore(row,sunFloat.home.row[1])}
+  const d=document.getElementById('sdatelab');document.getElementById('sfdate').textContent=d?d.textContent:''}
+(function(){const f=document.getElementById('sunfloat');L.DomEvent.disableClickPropagation(f);L.DomEvent.disableScrollPropagation(f);
+  ['touchstart','pointerdown'].forEach(ev=>f.addEventListener(ev,e=>e.stopPropagation()));
+  document.getElementById('sfmore').onclick=()=>{sheet('half');setTimeout(()=>{const b=document.getElementById('sunbox');panelEl.scrollTo({top:b.offsetTop-30,behavior:'smooth'})},280)};
+  new MutationObserver(sunFloatSync).observe(panelEl,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('resize',sunFloatSync);sunFloatSync()})();
+
 map.on('click',()=>{if(isMobile()&&sheetState()!=='peek')sheet('peek')});
 
 function natCmp(a,b){const pa=parseInt(a)||9999,pb=parseInt(b)||9999;return pa-pb||String(a).localeCompare(String(b))}
@@ -1772,7 +1805,7 @@ function mineBanner(){const el=document.getElementById('minebar');if(!el)return;
   el.style.display='block';el.onclick=()=>{setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}}
 L.DomEvent.disableClickPropagation(document.getElementById('minebar'));
 // remember the Mine view when tracks exist
-const _setMode=setMode;setMode=function(m){_setMode(m);try{localStorage.setItem('ischgl-mode',m)}catch(e){}};
+const _setMode=setMode;setMode=function(m){_setMode(m);if(typeof sunFloatSync==='function')sunFloatSync();try{localStorage.setItem('ischgl-mode',m)}catch(e){}};
 
 // ===================== LIVE LIFT & PISTE STATUS =====================
 const LIVE_URL='https://raw.githubusercontent.com/Kevin9131/ischgl-map/main/status.json';
@@ -1808,8 +1841,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function isoLocal(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 (function(){const now=new Date();sunState.date=isoLocal(now);const m=now.getHours()*60+Math.round(now.getMinutes()/15)*15;sunState.mins=(m>=480&&m<=1050)?m:660;
   const y=now.getMonth()>=6?now.getFullYear():now.getFullYear()-1;
-  const P=[['Today',isoLocal(now)],['21 Dec',`${y}-12-21`],['1 Feb',`${y+1}-02-01`],['15 Mar',`${y+1}-03-15`],['15 Apr',`${y+1}-04-15`]];
-  const box=document.getElementById('spresets');P.forEach(([t,d])=>{const b=document.createElement('button');b.textContent=t;b.dataset.d=d;b.onclick=()=>setDate(d);box.appendChild(b)});
+  const P=[];for(let i=0;i<7;i++){const d=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);P.push([i===0?'Today':i===1?'Tomorrow':d.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'}),isoLocal(d)])}
+  const S=[['21 Dec',`${y}-12-21`],['1 Feb',`${y+1}-02-01`],['15 Mar',`${y+1}-03-15`],['15 Apr',`${y+1}-04-15`]];
+  const mk=(box,list)=>list.forEach(([t,d])=>{const b=document.createElement('button');b.textContent=t;b.dataset.d=d;b.onclick=()=>setDate(d);box.appendChild(b)});
+  mk(document.getElementById('spresets'),P);mk(document.getElementById('sseason'),S);
   document.getElementById('sdate').value=sunState.date;document.getElementById('sdate').onchange=e=>e.target.value&&setDate(e.target.value);
   const sl=document.getElementById('tslider');sl.value=sunState.mins;sl.oninput=e=>{sunState.mins=+e.target.value;sunChanged()};
   document.getElementById('play').onclick=()=>sunState.playing?stopPlay():startPlay();})();
@@ -1819,8 +1854,8 @@ function startPlay(){const sl=document.getElementById('tslider');if(sunState.min
 function stopPlay(){clearInterval(sunState.playing);sunState.playing=null;document.getElementById('play').textContent='▶'}
 function updateSunUI(){compass.update();if(state.mode!=='sun')return;const s=sunNow();
   document.getElementById('tlabel').textContent=fmtT(sunState.mins);
-  document.querySelectorAll('#spresets button').forEach(b=>b.classList.toggle('on',b.dataset.d===sunState.date));
-  document.getElementById('sdatelab').textContent=new Date(sunState.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'});
+  document.querySelectorAll('#spresets button,#sseason button').forEach(b=>b.classList.toggle('on',b.dataset.d===sunState.date));
+  document.getElementById('sdatelab').textContent=new Date(sunState.date+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'long'});{const fd=document.getElementById('sfdate');if(fd)fd.textContent=document.getElementById('sdatelab').textContent}
   const {rise,set}=dayBounds(sunState.date);const idw=TERRAIN?hutSunWindow(DATA.huts[1],sunState.date):null;
   document.getElementById('suninfo').innerHTML=s.alt>0?`Sun ${Math.round(s.alt)}° high in the ${compassName(s.az)} (${Math.round(s.az)}°) · max ${Math.round(noonAlt(sunState.date))}° today<br>${idw&&idw.from!=null?`Sun on the Idalp ${fmtT(idw.from)}–${fmtT(idw.to)} · in the valley it rises later`:`Sunrise ${fmtT(rise)} · sunset ${fmtT(set)}`}`:`Sun is below the horizon · sunrise ${fmtT(rise)}, sunset ${fmtT(set)}`;
   // sunniest pistes now
