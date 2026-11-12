@@ -887,11 +887,12 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .locbtn.on svg{color:#1a73e8}.locbtn.follow{background:#1a73e8}.locbtn.follow svg{color:#fff}
 .locbtn.wait svg{animation:spin 1.2s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.me{position:absolute;left:-11px;top:-11px;width:22px;height:22px}
-.me .dot{position:absolute;left:4px;top:4px;width:14px;height:14px;border-radius:50%;background:#1a73e8;border:3px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.15),0 1px 6px rgba(0,0,0,.35)}
-.me .hd{position:absolute;left:-9px;top:-9px;width:40px;height:40px}
-.me .pulse{position:absolute;left:-9px;top:-9px;width:40px;height:40px;border-radius:50%;background:#1a73e855;animation:pulse 2s ease-out infinite}
+.me{position:absolute;left:-15px;top:-15px;width:30px;height:30px}
+.me .dot{position:absolute;left:2px;top:2px;width:18px;height:18px;border-radius:50%;background:#1a73e8;border:4px solid #fff;box-shadow:0 0 0 2.5px #15202b,0 2px 10px rgba(0,0,0,.55)}
+.me .hd{position:absolute;left:-17px;top:-17px;width:64px;height:64px}
+.me .pulse{position:absolute;left:-15px;top:-15px;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,#ffffff00 40%,#1a73e866 41%,#1a73e800 70%);border:2px solid #15202b55;animation:pulse 2s ease-out infinite}
 @keyframes pulse{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.4);opacity:0}}
+#gpsbar .simbar{margin-top:5px;padding-top:5px;border-top:1px solid #ffffff30;font-size:12px;color:#ffd27a}#gpsbar .simbar a{color:#ffd27a;text-decoration:underline;cursor:pointer}
 #gpsbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top));z-index:850;background:#15202bee;color:#fff;border-radius:12px;padding:7px 12px;font-size:12.5px;line-height:1.35;display:none;max-width:calc(100% - 120px);text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.25)}
 #gpsbar b{font-size:14px}
 #gpsbar .near{color:#c9d6e3}
@@ -1361,7 +1362,7 @@ function markList(){document.querySelectorAll('#list .item').forEach(it=>it.clas
 const gps={watch:null,follow:true,ll:null,acc:null,alt:null,head:null,marker:null,circle:null,last:0};
 const LOC_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:#15202b"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="7.5"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3"/></svg>';
 const locCtl=L.control({position:'topleft'});
-locCtl.onAdd=function(){const b=L.DomUtil.create('button','locbtn');b.innerHTML=LOC_SVG;b.title='Show my location';L.DomEvent.disableClickPropagation(b);b.onclick=locClick;this.b=b;return b};
+locCtl.onAdd=function(){const b=L.DomUtil.create('button','locbtn');b.innerHTML=LOC_SVG;b.title='Show my location';L.DomEvent.disableClickPropagation(b);b.onclick=()=>locClick();this.b=b;return b};
 locCtl.addTo(map);
 // dark / light switch (follows the phone's setting until you tap it)
 const MOON='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1z"/></svg>',SUNI='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>';
@@ -1388,9 +1389,9 @@ function locClick(){
 function onPosErr(e){locState('');if(gps.watch!==null){navigator.geolocation.clearWatch(gps.watch);gps.watch=null}
   gpsMsg(e.code===1?'Location permission denied. On iPhone: Settings › Privacy & Security › Location Services › Safari Websites › "While Using".':'Could not get a GPS fix. Try again with a clear view of the sky.')}
 function gpsMsg(m){const g=document.getElementById('gpsbar');g.innerHTML=m;g.style.display='block';clearTimeout(gps.mt);gps.mt=setTimeout(()=>{if(gps.watch===null)g.style.display='none'},7000)}
-function meIcon(){const h=gps.head;return L.divIcon({className:'',iconSize:[0,0],html:`<div class="me"><div class="pulse"></div>${h!=null?`<svg class="hd" viewBox="-20 -20 40 40" style="transform:rotate(${h+ROT}deg)"><path d="M0 -19 L7 -6 L-7 -6 Z" fill="#1a73e8" opacity=".85"/></svg>`:''}<div class="dot"></div></div>`})}
+function meIcon(){const h=gps.head;return L.divIcon({className:'',iconSize:[0,0],html:`<div class="me"><div class="pulse"></div>${h!=null?`<svg class="hd" viewBox="-32 -32 64 64" style="transform:rotate(${h+ROT}deg)"><defs><radialGradient id="mehd" cx="0" cy="0" r="32" gradientUnits="userSpaceOnUse"><stop offset=".25" stop-color="#1a73e8" stop-opacity=".75"/><stop offset="1" stop-color="#1a73e8" stop-opacity="0"/></radialGradient></defs><path d="M0 0 L-15 -28 A32 32 0 0 1 15 -28 Z" fill="url(#mehd)"/></svg>`:''}<div class="dot"></div></div>`})}
 function onPos(p){const c=p.coords;gps.ll=[c.latitude,c.longitude];gps.acc=c.accuracy;gps.alt=c.altitude;gps.head=(c.heading!=null&&!isNaN(c.heading)&&(c.speed||0)>1)?c.heading:gps.head;
-  if(!gps.marker){gps.circle=L.circle(gps.ll,{radius:gps.acc,renderer:canvas,color:'#1a73e8',weight:1,fillColor:'#1a73e8',fillOpacity:.12,interactive:false}).addTo(map);gps.marker=L.marker(gps.ll,{icon:meIcon(),interactive:false,zIndexOffset:2000}).addTo(map);
+  if(!gps.marker){gps.circle=L.circle(gps.ll,{radius:gps.acc,renderer:canvas,color:'#1a73e8',weight:1.5,fillColor:'#1a73e8',fillOpacity:.08,interactive:false}).addTo(map);gps.marker=L.marker(gps.ll,{icon:meIcon(),interactive:false,zIndexOffset:2000}).addTo(map);
     const inArea=allBounds.pad(0.15).contains(gps.ll);if(inArea){map.setView(gps.ll,Math.max(map.getZoom(),15))}else gps.follow=false}
   else{gps.marker.setLatLng(gps.ll).setIcon(meIcon());gps.circle.setLatLng(gps.ll).setRadius(gps.acc);if(gps.follow)map.panTo(gps.ll,{animate:true,duration:.5})}
   locState(gps.follow?'follow':'on');updateGpsBar();if(R.pendingGps){R.pendingGps=false;if(state.tab==='route')runRoute()}}
@@ -1400,7 +1401,7 @@ function segDist(p,a,b){// metres from p to segment ab (equirectangular)
   const k=Math.cos(p[0]*D2R);const ax=(a[1]-p[1])*111320*k,ay=(a[0]-p[0])*111320,bx=(b[1]-p[1])*111320*k,by=(b[0]-p[0])*111320;
   const dx=bx-ax,dy=by-ay;const L2=dx*dx+dy*dy;let tt=L2?-(ax*dx+ay*dy)/L2:0;tt=Math.max(0,Math.min(1,tt));const x=ax+tt*dx,y=ay+tt*dy;return {d:Math.hypot(x,y),t:tt}}
 function updateGpsBar(){const p=gps.ll,g=document.getElementById('gpsbar');if(!p)return;
-  if(!allBounds.pad(0.15).contains(p)){const d=mdist(p,allBounds.getCenter().lat?[allBounds.getCenter().lat,allBounds.getCenter().lng]:p);g.innerHTML=`You're <b>${d>=10000?Math.round(d/1000):(d/1000).toFixed(1)} km</b> from the ski area<br><span class="near">GPS ±${Math.round(gps.acc)} m</span>`;g.style.display='block';return}
+  if(!allBounds.pad(0.15).contains(p)){const d=mdist(p,allBounds.getCenter().lat?[allBounds.getCenter().lat,allBounds.getCenter().lng]:p);(g.querySelector('.gi')||g).innerHTML=`You're <b>${d>=10000?Math.round(d/1000):(d/1000).toFixed(1)} km</b> from the ski area<br><span class="near">GPS ±${Math.round(gps.acc)} m</span>`;g.style.display='block';return}
   // nearest piste
   let best={d:1e9};DATA.runs.forEach(r=>{if(!state.show[r.c])return;for(let k=0;k<r.p.length-1;k++){const s=segDist(p,r.p[k],r.p[k+1]);if(s.d<best.d)best={d:s.d,r,e:r.p[k][2]+(r.p[k+1][2]-r.p[k][2])*s.t}}});
   let lift={d:1e9};DATA.lifts.forEach(l=>{if(l.uc||l.t==='magic_carpet')return;const d=mdist(p,l.p[0]);if(d<lift.d)lift={d,l}});
@@ -1408,7 +1409,7 @@ function updateGpsBar(){const p=gps.ll,g=document.getElementById('gpsbar');if(!p
   const alt=gps.alt!=null?Math.round(gps.alt):(best.d<80?Math.round(best.e):null);
   const fm=d=>d<1000?Math.round(d/10)*10+' m':(d/1000).toFixed(1)+' km';
   const on=best.d<=35&&best.r;
-  g.innerHTML=`${alt!=null?`<b>${alt.toLocaleString('en')} m</b> · `:''}${on?`on <b>${best.r.n?'piste '+best.r.n:'a piste'}</b>`:best.r?`${fm(best.d)} from ${best.r.n?'piste '+best.r.n:'a piste'}`:''}<br><span class="near">Lift <a data-l="${lift.l.i}">${lift.l.ref||''} ${lift.l.n}</a> ${fm(lift.d)} · <a data-h="${hut.h.i}">${hut.h.n}</a> ${fm(hut.d)}</span>`;
+  (g.querySelector('.gi')||g).innerHTML=`${alt!=null?`<b>${alt.toLocaleString('en')} m</b> · `:''}${on?`on <b>${best.r.n?'piste '+best.r.n:'a piste'}</b>`:best.r?`${fm(best.d)} from ${best.r.n?'piste '+best.r.n:'a piste'}`:''}<br><span class="near">Lift <a data-l="${lift.l.i}">${lift.l.ref||''} ${lift.l.n}</a> ${fm(lift.d)} · <a data-h="${hut.h.i}">${hut.h.n}</a> ${fm(hut.d)}</span>`;
   g.style.display='block';
   g.querySelectorAll('[data-l]').forEach(a=>a.onclick=()=>{gps.follow=false;locState('on');selectLift(DATA.lifts[+a.dataset.l],true)});
   g.querySelectorAll('[data-h]').forEach(a=>a.onclick=()=>{gps.follow=false;locState('on');selectHut(DATA.huts[+a.dataset.h],true)});
