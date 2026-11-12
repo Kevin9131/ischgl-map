@@ -15,6 +15,7 @@ An interactive piste map of Ischgl (AT) and Samnaun (CH), built to use on your p
 - **Meeting point**: long-press the map, set a time and share the link
 - **My pistes**: import your Ski Tracks GPX/KML files to see which pistes you've boarded and which are still left
 - **SOS**: ski patrol and emergency numbers, with your current position
+- **Dark mode**: follows your phone's setting, or tap the 🌙 button to switch
 - **Valley at the bottom**: switch between north-up and Ischgl at the bottom of the map
 - **Works offline** once you've added it to your Home Screen
 
