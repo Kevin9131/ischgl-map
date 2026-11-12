@@ -1326,6 +1326,10 @@ document.getElementById('grab').onclick=cycleSheet;document.getElementById('phea
 (function(){let y0=null;const start=e=>{y0=e.touches[0].clientY},end=e=>{if(y0===null)return;const dy=e.changedTouches[0].clientY-y0;y0=null;if(Math.abs(dy)<25)return;const s=sheetState();if(dy<0)sheet(s==='peek'?'half':'full');else sheet(s==='full'?'half':'peek');e.preventDefault()};
   ['grab','phead'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('touchstart',start,{passive:true});el.addEventListener('touchend',end)})})();
 document.getElementById('q').addEventListener('focus',()=>sheet('full'));
+// iOS keeps a focused control (sun slider, date field) in view and scrolls the panel back to it while you pan the map: drop focus when the map is touched
+(function(){const drop=()=>{const a=document.activeElement;if(a&&a!==document.body&&a.id!=='q'&&/INPUT|SELECT|BUTTON/.test(a.tagName))a.blur()};
+  const m=document.getElementById('map');m.addEventListener('touchstart',drop,{passive:true});m.addEventListener('mousedown',drop);map.on('dragstart zoomstart',drop);
+  ['tslider','sdate'].forEach(id=>{const el=document.getElementById(id);if(el){el.addEventListener('change',()=>setTimeout(()=>el.blur(),50));el.addEventListener('touchend',()=>setTimeout(()=>el.blur(),50),{passive:true})}})})();
 if(isMobile())sheet('peek');
 map.on('click',()=>{if(isMobile()&&sheetState()!=='peek')sheet('peek')});
 
