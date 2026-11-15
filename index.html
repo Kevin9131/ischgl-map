@@ -1106,7 +1106,7 @@ const RotProj={bounds:L.bounds([-SM.bounds.max.x,-SM.bounds.max.y],[-SM.bounds.m
 const CRS_SOUTH=L.extend({},L.CRS.EPSG3857,{code:'ROT180',projection:RotProj});
 let ROT=180;
 try{if(localStorage.getItem('ischgl-north-up')==='1')ROT=0}catch(e){}
-const map=L.map('map',{crs:ROT?CRS_SOUTH:L.CRS.EPSG3857,zoomControl:true,preferCanvas:true,zoomSnap:0.25,minZoom:11,maxZoom:18,attributionControl:true});
+const map=L.map('map',{crs:ROT?CRS_SOUTH:L.CRS.EPSG3857,zoomControl:false,preferCanvas:true,zoomSnap:0.25,minZoom:11,maxZoom:18,attributionControl:true});
 map.attributionControl.setPrefix('');
 map.attributionControl.addAttribution('Piste &amp; lift data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors via <a href="https://openskimap.org">OpenSkiMap</a> / <a href="https://openskistats.org">OpenSkiStats</a>');
 L.control.scale({imperial:false,position:'bottomleft'}).addTo(map);
