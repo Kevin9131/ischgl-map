@@ -778,6 +778,19 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 .lref.new{background:#12a150}.lref.uc{background:#8a95a1}
 .newnote{margin-top:8px;font-size:12px;background:#e9f7ef;color:#0d6b37;border-radius:6px;padding:7px 9px;line-height:1.4}
 .newnote.uc{background:#f1f4f7;color:#4b5866}
+.cammk{width:24px;height:24px;border-radius:7px;background:#0e7c86;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff}.cammk svg{width:14px;height:14px}.cammk.sel{outline:3px solid #0e7c8666}
+html.dark .cammk{border-color:#0f151b}
+.camlist{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.cam a{display:block;text-decoration:none;color:inherit}
+.cam .ci{position:relative;border-radius:9px;overflow:hidden;background:#e9eef2;aspect-ratio:16/9}
+.cam .ci.noimg{aspect-ratio:auto;height:64px}.cam .ci.noimg .ph{padding-left:90px;justify-content:flex-start}
+.cam .ci img{width:100%;height:100%;object-fit:cover;display:block}
+.cam .ci .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12.5px;color:#5b6b7a;text-align:center;padding:10px}
+.cam .ci .tag{position:absolute;left:7px;top:7px;background:#15202bd9;color:#fff;font-size:11px;font-weight:600;border-radius:6px;padding:2px 7px}
+.cam .ci .tag.live{background:#d93025}
+.cam .cl{display:flex;justify-content:space-between;font-size:12.5px;margin-top:4px}.cam .cl span{color:#1a73e8;font-weight:600}
+.camcred{font-size:10.5px;color:#8a95a1;margin-top:8px}
+html.dark .cam .ci{background:#1e2731}html.dark .cam .cl span{color:#7fb3f0}
 .hutmk{width:26px;height:26px;border-radius:50%;background:var(--hut);border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;cursor:pointer}
 .hutmk svg{width:14px;height:14px}
 .hutmk.sel{background:#e0312b;transform:scale(1.2)}
@@ -941,6 +954,10 @@ header p{margin:0;color:var(--muted);font-size:12.5px}
 
 
 #sunfloat{display:none}
+.wxrow{cursor:pointer}.wxrow.on{background:#eaf3ff;box-shadow:inset 3px 0 0 #1a73e8}html.dark .wxrow.on{background:#16273b}
+.wxpick{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 2px;scrollbar-width:none}.wxpick::-webkit-scrollbar{display:none}
+.wxpick button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:16px;padding:5px 11px;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
+.wxpick button.on{background:#1a73e8;border-color:#1a73e8;color:#fff}html.dark .wxpick button{background:var(--s2)}html.dark .wxpick button.on{background:#2f7be0;border-color:#2f7be0}
 .seasonrow{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11.5px;color:#8a7440}.seasonrow .presets{margin-top:0}
 html.dark .seasonrow{color:#d9c17f}
 #spresets{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}#spresets::-webkit-scrollbar{display:none}#spresets button{flex:0 0 auto}
@@ -1018,6 +1035,7 @@ html.dark .livebox.on{background:#123222}
 html.dark .mmsg{color:#7fe0a8}
 .thbtn{width:34px;height:34px;background:#fff;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;padding:0;margin-top:8px!important;color:#15202b}
 .thbtn svg{width:19px;height:19px}
+.thbtn.camon{background:#0e7c86!important;color:#fff!important}.thbtn.camon svg{color:#fff!important}
 @media (max-width:760px){
   html.dark #grab,html.dark .tabs{background:var(--panel)}
   html.dark #grab span{background:#3a4552}
@@ -1079,7 +1097,7 @@ function themeColours(){DARK=document.documentElement.classList.contains('dark')
 const DIFFNAME={blue:'Blue · easy',red:'Red · intermediate',black:'Black · difficult',route:'Ski route (ungroomed, unpatrolled)'};
 const HUT_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M8.1 13.34l2.83-2.83L3.91 3.5a4.008 4.008 0 000 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>';
 const LIFT_GROUP={gondola:'cable',cable_car:'cable',chair_lift:'chair','t-bar':'drag',platter:'drag',drag_lift:'drag',magic_carpet:'drag'};
-const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:1,labels:1,arrows:1,weather:1,relief:1,mytracks:1,live:1},mode:'diff',tab:'huts',q:'',sel:null};
+const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:1,labels:1,arrows:1,weather:1,relief:1,mytracks:1,live:1,cams:0},mode:'diff',tab:'huts',q:'',sel:null};
 
 // rotated CRS: 180° (south up) so the Ischgl valley sits at the bottom
 const SM=L.Projection.SphericalMercator;
@@ -1283,7 +1301,7 @@ function setOrientation(r){const c=map.getCenter(),z=map.getZoom();ROT=r;if(reli
   const s=state.sel;if(s){const [k,...v]=s.split(':');const id=v.join(':');if(k==='r')selectRun(runGroups[id]);if(k==='l')selectLift(DATA.lifts[+id]);if(k==='h')selectHut(DATA.huts[+id])}}
 
 // --- selection
-function clearSel(){state.selGroup=null;hl.clearLayers();document.getElementById('card').style.display='none';hutMarkers.forEach(m=>{const el=m.getElement();el&&el.firstChild.classList.remove('sel')});state.sel=null;markList()}
+function clearSel(){state.selGroup=null;hl.clearLayers();document.getElementById('card').style.display='none';hutMarkers.forEach(m=>{const el=m.getElement();el&&el.firstChild.classList.remove('sel')});document.querySelectorAll('.cammk.sel').forEach(e=>e.classList.remove('sel'));state.sel=null;markList()}
 map.on('click',clearSel);
 function card(html){const c=document.getElementById('card');c.innerHTML=html;c.style.display='block';c.scrollTop=0;c.querySelector('.x').onclick=clearSel;if(isMobile()&&sheetState()!=='peek')sheet('peek')}
 function flyPad(){return isMobile()?{paddingTopLeft:[30,70],paddingBottomRight:[30,Math.min(innerHeight*0.55,420)],maxZoom:15.5,duration:.6}:{padding:[70,70],maxZoom:15.5,duration:.6}}
@@ -1328,9 +1346,9 @@ function selectHut(h,fly){clearSel();state.sel='h:'+h.i;const el=hutMarkers[h.i]
 }
 
 // --- panel
-const chipDefs=[['blue','Blue','sw',COL.blue],['red','Red','sw',COL.red],['black','Black','sw',COL.black],['route','Ski routes','sw',COL.route],['cable','Gondolas','sw','#2d3238'],['chair','Chairlifts','sw','#2d3238'],['drag','Drag lifts','sw','#8a9099'],['huts','Restaurants','dot','#7a3e9d'],['arrows','Direction arrows','dot','#2d3238'],['weather','Weather on map','dot','#4aa3df'],['live','Live status','dot','#12a150'],['relief','Terrain','dot','#a3b5a0'],['mytracks','My tracks','dot','#7a3e9d'],['labels','Labels','dot','#9aa6b2']];
+const chipDefs=[['blue','Blue','sw',COL.blue],['red','Red','sw',COL.red],['black','Black','sw',COL.black],['route','Ski routes','sw',COL.route],['cable','Gondolas','sw','#2d3238'],['chair','Chairlifts','sw','#2d3238'],['drag','Drag lifts','sw','#8a9099'],['huts','Restaurants','dot','#7a3e9d'],['arrows','Direction arrows','dot','#2d3238'],['weather','Weather on map','dot','#4aa3df'],['live','Live status','dot','#12a150'],['cams','Webcams','dot','#0e7c86'],['relief','Terrain','dot','#a3b5a0'],['mytracks','My tracks','dot','#7a3e9d'],['labels','Labels','dot','#9aa6b2']];
 const chips=document.getElementById('chips');
-chipDefs.forEach(([k,t,cls,c])=>{const b=document.createElement('button');b.className='chip';b.dataset.k=k;b.innerHTML=`<span class="${cls}" style="background:${c}"></span>${t}`;b.onclick=()=>{state.show[k]=state.show[k]?0:1;b.classList.toggle('off',!state.show[k]);render()};chips.appendChild(b)});
+chipDefs.forEach(([k,t,cls,c])=>{const b=document.createElement('button');b.className='chip';b.dataset.k=k;b.innerHTML=`<span class="${cls}" style="background:${c}"></span>${t}`;b.classList.toggle('off',!state.show[k]);b.onclick=()=>{state.show[k]=state.show[k]?0:1;b.classList.toggle('off',!state.show[k]);render();if(k==='cams'&&typeof camCtl!=='undefined')camCtl.draw()};chips.appendChild(b)});
 document.querySelectorAll('#mode button').forEach(b=>b.onclick=()=>{setMode(b.dataset.m);if(b.dataset.m==='sun'&&isMobile())sheet('peek');if(b.dataset.m==='mine'){setTab('runs');if(isMobile()){sheet('half');scrollToTabs()}}});
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{setTab(b.dataset.t);if(isMobile()&&sheetState()==='peek')sheet('half');scrollToTabs()});
 document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();autoTab();buildList()});
@@ -1615,7 +1633,7 @@ function windArrow(dir){return `<i class="warr" style="transform:rotate(${dir+18
 function wxBadges(){wxLayer.clearLayers();if(!WX.data||!state.show.weather||map.getZoom()<12.5)return;
   WX.data.forEach((d,i)=>{const s=WX_ST[i],c=d.current;if(!c)return;const g=c.wind_gusts_10m;
     L.marker(s.ll,{interactive:true,zIndexOffset:900,icon:L.divIcon({className:'',iconSize:[0,0],html:`<div class="wxb${g>=60?' gust':''}">${wmo(c.weather_code)[0]} <b>${Math.round(c.temperature_2m)}°</b> ${windArrow(c.wind_direction_10m)}${Math.round(c.wind_speed_10m)}</div>`})})
-     .on('click',()=>{setTab('weather');if(isMobile()){sheet('half');scrollToTabs()}}).addTo(wxLayer)});
+     .on('click',()=>{WX.sel=i;setTab('weather');if(isMobile()){sheet('half');scrollToTabs()}setTimeout(wxToForecast,350)}).addTo(wxLayer)});
   if(!map.hasLayer(wxLayer))wxLayer.addTo(map)}
 function wxRender(){if(state.tab!=='weather')return;const el=document.getElementById('list');if(!el)return;
   let h='<div class="wx">';
@@ -1624,20 +1642,23 @@ function wxRender(){if(state.tab!=='weather')return;const el=document.getElement
   h+=`<div class="wxhead">${WX.loading?'Updating…':WX.data?`Updated ${age<1?'just now':age+' min ago'}${WX.err?' · <span style="color:#b45309">offline, showing saved data</span>':''}`:'No weather data yet'}<button id="wxr">↻ Refresh</button></div>`;
   if(WX.data){const now=new Date();
     h+=WX.data.map((d,i)=>{const s=WX_ST[i],c=d.current;if(!c)return '';const [ic,tx]=wmo(c.weather_code);const g=c.wind_gusts_10m;
-      return `<div class="wxrow${g>=60?' gust':''}" data-i="${i}"><div class="wxic">${ic}</div><div class="wxn"><b>${s.n}</b><span>${s.e.toLocaleString('en')} m · ${tx}</span></div><div class="wxt"><b>${Math.round(c.temperature_2m)}°</b><span>feels ${Math.round(c.apparent_temperature)}°</span></div><div class="wxw">${windArrow(c.wind_direction_10m)} <b>${Math.round(c.wind_speed_10m)}</b><span>gusts ${Math.round(g)} km/h</span></div></div>`}).join('');
+      return `<div class="wxrow${g>=60?' gust':''}${i===(WX.sel??1)?' on':''}" data-i="${i}"><div class="wxic">${ic}</div><div class="wxn"><b>${s.n}</b><span>${s.e.toLocaleString('en')} m · ${tx}</span></div><div class="wxt"><b>${Math.round(c.temperature_2m)}°</b><span>feels ${Math.round(c.apparent_temperature)}°</span></div><div class="wxw">${windArrow(c.wind_direction_10m)} <b>${Math.round(c.wind_speed_10m)}</b><span>gusts ${Math.round(g)} km/h</span></div></div>`}).join('');
     const mx=Math.max(...WX.data.map(d=>d.current?d.current.wind_gusts_10m:0));
     if(mx>=60)h+=`<div class="rwarn" style="margin:8px 16px">Gusts up to ${Math.round(mx)} km/h on the peaks. High chairlifts and cable cars are often slowed or closed in wind like this.</div>`;
-    // next hours at Idalp
-    const I=WX.data[1];if(I&&I.hourly){const t=I.hourly.time;let k=t.findIndex(x=>new Date(x)>=new Date(now.getTime()-30*60e3));if(k<0)k=0;
+    // forecast for the chosen station (tap a station above or a weather badge on the map)
+    const si=WX.sel??1,S=WX_ST[si],I=WX.data[si];
+    h+=`<div class="wxpick" id="wxfc">${WX_ST.map((s,i)=>`<button data-i="${i}" class="${i===si?'on':''}">${s.n}</button>`).join('')}</div>`;if(I&&I.hourly){const t=I.hourly.time;let k=t.findIndex(x=>new Date(x)>=new Date(now.getTime()-30*60e3));if(k<0)k=0;
       const fl=I.hourly.freezing_level_height?I.hourly.freezing_level_height[k]:null;
-      h+=`<div class="group">Next hours · Idalp 2,320 m${fl!=null?` · freezing level ${Math.round(fl/50)*50} m`:''}</div><div class="wxhours">`;
+      h+=`<div class="group">Next hours · ${S.n} ${S.e.toLocaleString('en')} m${fl!=null?` · freezing level ${Math.round(fl/50)*50} m`:''}</div><div class="wxhours">`;
       for(let j=k;j<Math.min(k+10,t.length);j++){h+=`<div><span>${t[j].slice(11,13)}h</span>${wmo(I.hourly.weather_code[j])[0]}<b>${Math.round(I.hourly.temperature_2m[j])}°</b><small>${Math.round(I.hourly.wind_gusts_10m[j])}</small></div>`}
       h+='</div><div class="note" style="padding-top:4px">Small number = wind gusts in km/h.</div>'}
-    if(I&&I.daily){h+='<div class="group">3 days · Idalp</div>';
+    if(I&&I.daily){h+=`<div class="group">3 days · ${S.n}</div>`;
       I.daily.time.forEach((d,j)=>{const dt=new Date(d+'T12:00');h+=`<div class="wxday"><span class="d">${j===0?'Today':dt.toLocaleDateString('en-GB',{weekday:'short',day:'numeric'})}</span><span>${wmo(I.daily.weather_code[j])[0]}</span><span>${Math.round(I.daily.temperature_2m_min[j])}° / <b>${Math.round(I.daily.temperature_2m_max[j])}°</b></span><span>${I.daily.snowfall_sum[j]>0.2?'❄️ '+I.daily.snowfall_sum[j].toFixed(0)+' cm':''}</span><span class="g">💨 ${Math.round(I.daily.wind_gusts_10m_max[j])}</span></div>`})}}
   h+=`<div class="note">Forecast by <a href="https://open-meteo.com/">Open-Meteo.com</a> (CC BY 4.0), adjusted to each station's altitude. Mountain weather changes fast, so check the resort's official snow report too.</div></div>`;
   el.innerHTML=h;const r=el.querySelector('#wxr');if(r)r.onclick=()=>wxLoad(true);
-  el.querySelectorAll('.wxrow').forEach(x=>x.onclick=()=>{const s=WX_ST[+x.dataset.i];if(isMobile())sheet('peek');map.flyTo(s.ll,14,{duration:.6})})}
+  el.querySelectorAll('.wxrow,.wxpick button').forEach(x=>x.onclick=()=>{WX.sel=+x.dataset.i;wxRender();wxToForecast()})}
+function wxToForecast(){const fc=document.getElementById('wxfc');if(!fc)return;const b=fc.querySelector('button.on');if(b)fc.scrollLeft=b.offsetLeft-fc.offsetWidth/2+b.offsetWidth/2;
+  const p=isMobile()?panelEl:document.getElementById('list');const top=fc.getBoundingClientRect().top-p.getBoundingClientRect().top+p.scrollTop-60;p.scrollTo({top,behavior:'smooth'})}
 setInterval(()=>{if(document.visibilityState==='visible'&&(state.tab==='weather'||state.show.weather))wxLoad()},5*60e3);
 
 // ===================== MEETING POINT =====================
@@ -1706,6 +1727,37 @@ sosCtl.addTo(map);
 
 // taps, drags and scrolls inside the info card / GPS bar must not reach the map (a map tap closes the card)
 ['card','gpsbar'].forEach(id=>{const el=document.getElementById(id);L.DomEvent.disableClickPropagation(el);L.DomEvent.disableScrollPropagation(el)});
+
+// ===== webcams (official Ischgl / Samnaun cams; tap opens the live view on ischgl.com) =====
+const CAM_SVG='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 7h3l1.6-2h6.8L17 7h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1zm8 2.5A3.8 3.8 0 1 0 12 17a3.8 3.8 0 0 0 0-7.5z"/></svg>';
+const CAM_SPOTS=[
+ {n:'Ischgl village',e:1400,ll:[47.0118,10.2928],c:[[124696581,'ischgl-dorf','Webcam'],[100178315,'flyingcam-ischgl','FlyingCam']]},
+ {n:'Idalp',e:2320,ll:[46.9832,10.3152],c:[[100178351,'ischgl-tv','Live stream'],[100178345,'idalp','Webcam'],[108486387,'idalp','360° panorama']]},
+ {n:'Pardatschgrat',e:2624,ll:[46.9920,10.3248],c:[[100178355,'pardatschgrat','Live stream'],[100178353,'pardatschgrat','Webcam']]},
+ {n:'Greitspitz',e:2872,ll:[46.9702,10.3341],c:[[100000136,'greitspitz','Webcam']]},
+ {n:'Palinkopf',e:2864,ll:[46.9507,10.3094],c:[[100178319,'palinkopf','Live stream'],[100007712,'palinkopf','360° panorama']]},
+ {n:'Piz Val Gronda',e:2812,ll:[46.92355,10.29118],c:[[100163839,'piz-val-gronda','Webcam']]},
+ {n:'Alp Trida',e:2260,ll:[46.9790,10.3760],c:[[100178341,'alp-trida','Webcam']]},
+ {n:'Alp Trida Sattel',e:2511,ll:[46.9703,10.3670],c:[[100178361,'samnaun-tv','Live stream'],[100178343,'alp-trida-sattel','360° panorama']]},
+ {n:'Samnaun Dorf',e:1840,ll:[46.9440,10.3600],c:[[100178359,'samnaun-dorf','360° panorama']]},
+ {n:'Samnaun-Compatsch',e:1700,ll:[46.9585,10.3925],c:[[100178357,'samnaun-compatsch','360° panorama']]},
+];
+const camUrl=(id,slug)=>`https://www.ischgl.com/en/plan-your-trip/webcams/${slug}_webcam_${id}`;
+const camImg=id=>`https://www.ischgl.com/var/webcams/${id}.jpg?t=${Math.floor(Date.now()/300000)}`;
+const camLayer=L.layerGroup();const camMarkers=[];
+CAM_SPOTS.forEach((s,i)=>{const m=L.marker(s.ll,{icon:L.divIcon({className:'',html:`<div class="cammk">${CAM_SVG}</div>`,iconSize:[24,24],iconAnchor:[72,12]}),zIndexOffset:1100});
+  m.bindTooltip(`<b>📷 ${s.n}</b> · ${s.c.length} cam${s.c.length>1?'s':''}`,{direction:'top',offset:[-60,-12]});m.on('click',()=>camCard(i));m.addTo(camLayer);camMarkers.push(m)});
+function camCard(i){const s=CAM_SPOTS[i];clearSel();state.sel='c:'+i;const el=camMarkers[i].getElement();el&&el.firstChild.classList.add('sel');
+  const off=GPS&&!navigator.onLine;
+  card(`<div class="hd"><div class="hutic" style="background:#0e7c86">${CAM_SVG}</div><div><h3>${s.n}</h3><div class="sub">Webcam${s.c.length>1?'s':''} · ${s.e.toLocaleString('en')} m</div></div><button class="x" aria-label="Close">×</button></div>
+  <div class="bd">${off?'<div class="warn">You are offline: webcams need a connection.</div>':''}<div class="camlist">${s.c.map(([id,slug,type])=>`<div class="cam"><a href="${camUrl(id,slug)}" target="_blank" rel="noopener"><div class="ci"><div class="ph">${type==='360° panorama'?'360° panorama: tap to look around':'Tap to open the '+type.toLowerCase()}</div><img loading="lazy" referrerpolicy="no-referrer" alt="${s.n} ${type}" src="${camImg(id)}" onerror="this.parentNode.classList.add('noimg');this.remove()"><div class="tag${type==='Live stream'?' live':''}">${type==='Live stream'?'● LIVE':type}</div></div><div class="cl">${type}<span>Open ↗</span></div></a></div>`).join('')}</div>
+  <div class="camcred">Images and streams © Ischgl / TVB Paznaun-Ischgl. Opens on ischgl.com.</div></div>`)}
+const camCtl=L.control({position:'topleft'});
+camCtl.onAdd=function(){const b=L.DomUtil.create('button','thbtn');L.DomEvent.disableClickPropagation(b);b.onclick=()=>{state.show.cams=state.show.cams?0:1;render();this.draw();if(state.show.cams&&map.getZoom()<12.5)map.setZoom(12.5)};this.b=b;this.draw();return b};
+camCtl.draw=function(){if(!this.b)return;const on=!!state.show.cams;this.b.innerHTML=CAM_SVG;this.b.classList.toggle('camon',on);this.b.title=on?'Hide webcams':'Show webcams';this.b.setAttribute('aria-label',this.b.title);
+  const ch=document.querySelector('.chip[data-k=cams]');if(ch)ch.classList.toggle('off',!on)};
+camCtl.addTo(map);
+const _rcam=render;render=function(){_rcam();state.show.cams?camLayer.addTo(map):map.removeLayer(camLayer)};
 
 // ===================== MY TRACKS (Ski Tracks GPX/KML import) =====================
 const TRK={days:[],cov:null,runFrac:null,liftRides:null,on:false};
