@@ -1469,7 +1469,15 @@ function updateGpsBar(){const p=gps.ll,g=document.getElementById('gpsbar');if(!p
   g.querySelectorAll('[data-l]').forEach(a=>a.onclick=()=>{gps.follow=false;locState('on');selectLift(DATA.lifts[+a.dataset.l],true)});
   g.querySelectorAll('[data-h]').forEach(a=>a.onclick=()=>{gps.follow=false;locState('on');selectHut(DATA.huts[+a.dataset.h],true)});
 }
-if(GPS&&'serviceWorker' in navigator&&location.protocol==='https:'){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+if(GPS&&'serviceWorker' in navigator&&location.protocol==='https:'){
+  // a new version: the new service worker takes over and the app reloads itself once
+  const had=!!navigator.serviceWorker.controller;let reloaded=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(had&&!reloaded){reloaded=true;location.reload()}});
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    reg.update().catch(()=>{});
+    // the iPhone keeps home-screen apps asleep instead of restarting them, so also check when the app comes back to the front
+    document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')reg.update().catch(()=>{})});
+  }).catch(()=>{}))}
 
 // ===================== ROUTE PLANNER =====================
 const APP_URL='https://kevin9131.github.io/ischgl-map/';
