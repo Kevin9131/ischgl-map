@@ -10,7 +10,6 @@ An interactive piste map of Ischgl (AT) and Samnaun (CH), built to use on your p
 - **Live lift and piste status**: shows what's open right now, straight from the resort's own feed, refreshed every 3 minutes while the app is open
 - **Route planner**: get from A to B with only the lifts and pistes that are open, and pick the hardest colour you want to ski
 - **Sun and shade**: real mountain shadows for any date and time, plus which restaurant terraces get sun
-- **View from here**: tap the 🧍 button, then any spot on the map, to see a winter panorama from there, with peak names, pistes, lifts, restaurants and when the sun reaches that spot
 - **Weather at altitude** for the valley, the mid-stations and the peaks
 - **Live GPS** showing where you are on the map
 - **Meeting point**: long-press the map, set a time and share the link
@@ -64,7 +63,6 @@ Replace `index.html` and `sw.js` with the new versions. The service worker has a
 
 - Piste and lift data © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors, via [OpenSkiMap](https://openskimap.org) / OpenSkiStats
 - Terrain: Copernicus DEM GLO-30 © DLR e.V. 2010–2014 and © Airbus Defence and Space GmbH 2014–2018, provided under COPERNICUS by the European Union and ESA
-- Panorama terrain: Copernicus DEM GLO-30 (see above); peak names from Wikipedia
 - Weather: [Open-Meteo](https://open-meteo.com)
 - Lift status: Silvretta Arena / Intermaps
 - Webcams: © Ischgl / TVB Paznaun-Ischgl, opened on [ischgl.com](https://www.ischgl.com)
