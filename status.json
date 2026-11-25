@@ -1,69 +1,69 @@
 {
- "changed": "2026-11-24T17:10+00:00",
+ "changed": "2026-11-25T16:56+00:00",
  "lifts": {
   "A1": {
    "name": "Silvrettabahn",
-   "s": "closed"
+   "s": "open"
   },
   "A2": {
    "name": "Pardatschgratbahn",
-   "s": "closed"
+   "s": "open"
   },
   "A3": {
    "name": "Fimbabahn",
-   "s": "closed"
+   "s": "open"
   },
   "B1": {
    "name": "Velillbahn",
-   "s": "closed"
+   "s": "open"
   },
   "B10": {
    "name": "Förderband Viderböden",
-   "s": "closed"
+   "s": "open"
   },
   "B2": {
    "name": "Flimjochbahn",
-   "s": "closed"
+   "s": "open"
   },
   "B3": {
    "name": "Idjochbahn",
-   "s": "closed"
+   "s": "open"
   },
   "B4": {
    "name": "Greitspitzlift",
-   "s": "closed"
+   "s": "open"
   },
   "B5": {
    "name": "Sonnenbahn",
-   "s": "closed"
+   "s": "open"
   },
   "B6": {
    "name": "Übungslift Velill",
-   "s": "closed"
+   "s": "open"
   },
   "B7": {
    "name": "Übungslift Viderböden",
-   "s": "closed"
+   "s": "open"
   },
   "B8": {
    "name": "Gratbahn",
-   "s": "closed"
+   "s": "open"
   },
   "B9": {
    "name": "Förderband Übungsareal",
-   "s": "closed"
+   "s": "open"
   },
   "C1": {
    "name": "Höllbodenbahn",
-   "s": "closed"
+   "s": "open"
   },
   "C2": {
    "name": "Höllkarbahn",
-   "s": "closed"
+   "s": "open"
   },
   "C3": {
    "name": "Sassgalunbahn",
-   "s": "closed"
+   "s": "open"
   },
   "C4": {
    "name": "Nachtweidebahn",
@@ -71,23 +71,23 @@
   },
   "C5": {
    "name": "Lange Wandbahn",
-   "s": "closed"
+   "s": "open"
   },
   "D1": {
    "name": "Palinkopfbahn",
-   "s": "closed"
+   "s": "open"
   },
   "D2": {
    "name": "Zeblasbahn",
-   "s": "closed"
+   "s": "open"
   },
   "E1": {
    "name": "Paznauner Thayabahn",
-   "s": "closed"
+   "s": "open"
   },
   "E2": {
    "name": "Höllspitzbahn",
-   "s": "closed"
+   "s": "open"
   },
   "E3": {
    "name": "Bodenalpbahn",
@@ -95,7 +95,7 @@
   },
   "E4": {
    "name": "Gampenbahn",
-   "s": "closed"
+   "s": "open"
   },
   "E5": {
    "name": "Piz Val Grondabahn",
@@ -103,11 +103,11 @@
   },
   "F1": {
    "name": "Velilleckbahn",
-   "s": "closed"
+   "s": "open"
   },
   "F2": {
    "name": "Pardoramabahn",
-   "s": "closed"
+   "s": "open"
   },
   "G1": {
    "name": "Übungslift Mathon",
@@ -119,7 +119,7 @@
   },
   "L1": {
    "name": "Twinliner",
-   "s": "closed"
+   "s": "open"
   },
   "L2": {
    "name": "Luftseilbahn",
@@ -135,7 +135,7 @@
   },
   "N1": {
    "name": "Flimsattelbahn",
-   "s": "closed"
+   "s": "open"
   },
   "N2": {
    "name": "Visnitzbahn",
@@ -143,11 +143,11 @@
   },
   "N3": {
    "name": "Milolift (Babylift)",
-   "s": "closed"
+   "s": "open"
   },
   "N4": {
    "name": "Viderjochbahn 1",
-   "s": "closed"
+   "s": "open"
   },
   "N5": {
    "name": "Alp Trider Ecklift",
@@ -155,11 +155,11 @@
   },
   "N6": {
    "name": "Alp Trider Sattelbahn",
-   "s": "closed"
+   "s": "open"
   },
   "O1": {
    "name": "Greitspitzbahn",
-   "s": "closed"
+   "s": "open"
   },
   "O2": {
    "name": "Blais Grondalift",
@@ -167,7 +167,7 @@
   },
   "O4": {
    "name": "Viderjochbahn 2",
-   "s": "closed"
+   "s": "open"
   },
   "P1": {
    "name": "Musellalift",
@@ -182,15 +182,15 @@
    "s": "closed"
   }
  },
- "resortUpdate": "2026-11-24T18:08:21",
+ "resortUpdate": "2026-11-25T17:48:12",
  "slopes": {
   "10|red": {
    "name": "Flimjoch - Idalp",
-   "s": "closed"
+   "s": "open"
   },
   "11|blue": {
    "name": "Idjoch - Idalp",
-   "s": "closed"
+   "s": "open"
   },
   "12a|route": {
    "name": "Idjoch - Höllkar",
@@ -198,7 +198,7 @@
   },
   "12|red": {
    "name": "Idjoch - Höllboden",
-   "s": "closed"
+   "s": "open"
   },
   "13|black": {
    "name": "start piste eleven",
@@ -206,7 +206,7 @@
   },
   "13|red": {
    "name": "Greitspitze - Idalp",
-   "s": "closed"
+   "s": "open"
   },
   "14a|black": {
    "name": "Greitspitz - Höllkar",
@@ -214,7 +214,7 @@
   },
   "14b|black": {
    "name": "Greitspitze - Höllkar",
-   "s": "closed"
+   "s": "open"
   },
   "14c|black": {
    "name": "Greitspitze - Höllkar",
@@ -222,11 +222,11 @@
   },
   "14|red": {
    "name": "Greitspitze - Idjoch",
-   "s": "closed"
+   "s": "open"
   },
   "15|black": {
    "name": "Greitspitze - Höllkar",
-   "s": "closed"
+   "s": "open"
   },
   "1a|red": {
    "name": "valley run - Pardatschgrat",
@@ -234,31 +234,31 @@
   },
   "1|red": {
    "name": "Idalp - middle station Silvrettabahn A1",
-   "s": "closed"
+   "s": "open"
   },
   "20|black": {
    "name": "Palinkopf - Palinkopfbahn valley",
-   "s": "closed"
+   "s": "open"
   },
   "21|black": {
    "name": "Zeblasbahn mountain- Zeblasbahn valley",
-   "s": "closed"
+   "s": "open"
   },
   "22|blue": {
    "name": "Palinkopf - Palinkopfbahn valley",
-   "s": "closed"
+   "s": "open"
   },
   "23|blue": {
    "name": "Palinkopf valley - Höllboden",
-   "s": "closed"
+   "s": "open"
   },
   "24|red": {
    "name": "Höllkarbahn mountain - Höllkarbahn valley",
-   "s": "closed"
+   "s": "open"
   },
   "25|red": {
    "name": "Sassgalun - Höllboden",
-   "s": "closed"
+   "s": "open"
   },
   "26a|black": {
    "name": "Höllkar",
@@ -278,11 +278,11 @@
   },
   "2|blue": {
    "name": "Idalp - Höllboden",
-   "s": "closed"
+   "s": "open"
   },
   "30|red": {
    "name": "Sassgalun - Paznauner Thaya",
-   "s": "closed"
+   "s": "open"
   },
   "31|red": {
    "name": "Sassgalun - Paznauner Thaya",
@@ -290,19 +290,19 @@
   },
   "32|red": {
    "name": "Höllspitz - Restaurant Schwarzwand",
-   "s": "closed"
+   "s": "open"
   },
   "33|black": {
    "name": "Palinkopf - Paznauner Thaya",
-   "s": "closed"
+   "s": "open"
   },
   "34|black": {
    "name": "Höllspitz - Bodenalpbahn Bergstation",
-   "s": "closed"
+   "s": "open"
   },
   "34|red": {
    "name": "Höllspitz - Bodenalpbahn Bergstation",
-   "s": "closed"
+   "s": "open"
   },
   "35|black": {
    "name": "Höllspitz - Paznauner Thaya",
@@ -342,11 +342,11 @@
   },
   "40c|red": {
    "name": "Gampenalp",
-   "s": "closed"
+   "s": "open"
   },
   "40|red": {
    "name": "Palinkopf - Gampenalp",
-   "s": "closed"
+   "s": "open"
   },
   "41|black": {
    "name": "Palinkopf - Piz Val Gronda Tal",
@@ -362,11 +362,11 @@
   },
   "4a|black": {
    "name": "Velilleckbahn mountain - Velilleckbahn valley",
-   "s": "closed"
+   "s": "open"
   },
   "4|black": {
    "name": "F1 mountain - middle station A2",
-   "s": "closed"
+   "s": "open"
   },
   "5a|red": {
    "name": "Pardatschgrat",
@@ -390,19 +390,19 @@
   },
   "62b|blue": {
    "name": "Viderjoch - Alp Trida",
-   "s": "closed"
+   "s": "open"
   },
   "62|blue": {
    "name": "Viderjoch - Alp Trida",
-   "s": "closed"
+   "s": "open"
   },
   "63|blue": {
    "name": "Idjoch - Alp Trida",
-   "s": "closed"
+   "s": "open"
   },
   "64|blue": {
    "name": "Idjoch - Salaas",
-   "s": "closed"
+   "s": "open"
   },
   "65a|red": {
    "name": "Visnitzbahn mountain - Alp Trida",
@@ -442,15 +442,15 @@
   },
   "69|blue": {
    "name": "Alp Trida Eck - Alp Trida",
-   "s": "closed"
+   "s": "open"
   },
   "6a|black": {
    "name": "Pardatschgrat - Velill",
-   "s": "closed"
+   "s": "open"
   },
   "6|blue": {
    "name": "Pardatschgrat - Idalp",
-   "s": "closed"
+   "s": "open"
   },
   "70a|red": {
    "name": "Greitspitze - Salaas",
@@ -462,7 +462,7 @@
   },
   "71|blue": {
    "name": "Viderjochbahn mountain - Salaas",
-   "s": "closed"
+   "s": "open"
   },
   "72a|red": {
    "name": "Idjoch - Salaas",
@@ -494,7 +494,7 @@
   },
   "80c|red": {
    "name": "Zeblasbahn mountain station - Samnaun",
-   "s": "closed"
+   "s": "open"
   },
   "80|red": {
    "name": "slope to Samnaun village",
@@ -506,7 +506,7 @@
   },
   "8|blue": {
    "name": "Velillbahn mountain - Idalp",
-   "s": "closed"
+   "s": "open"
   },
   "9|black": {
    "name": "Flimjoch Mountain - Idalp",
