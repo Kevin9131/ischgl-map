@@ -9,7 +9,7 @@ doesn't get a commit every 15 minutes.
 
 Usage: python fetch_status.py [local_html_file_for_testing]
 """
-import datetime, json, os, re, sys, urllib.request
+import datetime, json, os, re, sys, urllib.parse, urllib.request
 from bs4 import BeautifulSoup
 
 # 1st choice: the Intermaps feed behind the official Ischgl skimap/app (JSON)
@@ -111,6 +111,8 @@ def parse_feed(data):
             if group == "routes" and colour == "other":
                 continue  # hiking / toboggan routes
             key = f"{m.group(1)}|{colour}"
+            if m.group(1) == "1" and re.search(r"(middle station|mittelstation).*[-–]\s*ischgl", title, re.I):
+                key += "|low"
             s = word(row.get("status") or p.get("status"))
             if key not in slopes or s == "open":
                 slopes[key] = {"name": m.group(2), "s": s}
@@ -200,6 +202,7 @@ def main():
             old = json.load(open(OUT, encoding="utf-8"))
         except Exception:
             pass
+    notify_new_openings(lifts, slopes, upd)
     same = all(old.get(k) == new[k] for k in ("resortUpdate", "lifts", "slopes"))
     n_open = sum(v["s"] == "open" for v in lifts.values())
     print(f"{n_open}/{len(lifts)} lifts open, {sum(v['s']=='open' for v in slopes.values())}/{len(slopes)} pistes open, resort update {upd}")
@@ -210,6 +213,57 @@ def main():
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(new, f, ensure_ascii=False, indent=1, sort_keys=True)
     print("status.json updated")
+
+
+# ---------------- WhatsApp alerts (CallMeBot) ----------------
+# Sends a WhatsApp message when a lift or piste opens that was not open yesterday or today,
+# so the normal close-in-the-evening / open-in-the-morning cycle doesn't spam you.
+# Needs two repository secrets: CALLMEBOT_PHONE (+31...) and CALLMEBOT_APIKEY.
+NOTIFY_STATE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "notify_state.json")
+
+
+def notify_new_openings(lifts, slopes, upd):
+    today = datetime.date.today()
+    try:
+        state = json.load(open(NOTIFY_STATE, encoding="utf-8"))
+    except Exception:
+        state = {}
+    first_run = not state
+    fresh_l, fresh_s = [], []
+    for kind, items, out in (("L", lifts, fresh_l), ("S", slopes, fresh_s)):
+        for k, v in items.items():
+            if v["s"] != "open":
+                continue
+            key = f"{kind}:{k}"
+            last = state.get(key)
+            if not last or (today - datetime.date.fromisoformat(last)).days > 1:
+                out.append((k, v["name"]))
+            state[key] = today.isoformat()
+    with open(NOTIFY_STATE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=1, sort_keys=True)
+    phone, key = os.environ.get("CALLMEBOT_PHONE"), os.environ.get("CALLMEBOT_APIKEY")
+    if not (fresh_l or fresh_s) or not phone or not key:
+        return
+    n_l = sum(v["s"] == "open" for v in lifts.values())
+    n_s = sum(v["s"] == "open" for v in slopes.values())
+    when = (upd or "")[11:16]
+    lines = [f"⛷️ Ischgl: nieuw open{' (' + when + ')' if when else ''}"]
+    if fresh_l:
+        lines.append("Liften: " + ", ".join(f"{c} {n}" for c, n in sorted(fresh_l)))
+    if fresh_s:
+        nums = sorted({k.split("|")[0] for k, _ in fresh_s}, key=lambda x: (int(re.match(r"\d+", x).group()), x))
+        lines.append("Pistes: " + ", ".join(nums))
+    lines.append(f"Nu open: {n_l}/{len(lifts)} liften, {n_s}/{len(slopes)} pistes")
+    lines.append("https://kevin9131.github.io/ischgl-map/")
+    text = "\n".join(lines)
+    if first_run:  # don't list everything that happens to be open on the very first run
+        text = f"✅ WhatsApp-meldingen voor de Ischgl-kaart staan aan.\nNu open: {n_l}/{len(lifts)} liften, {n_s}/{len(slopes)} pistes.\nJe krijgt een bericht zodra er iets nieuws opengaat."
+    url = "https://api.callmebot.com/whatsapp.php?" + urllib.parse.urlencode({"phone": phone, "apikey": key, "text": text})
+    try:
+        with urllib.request.urlopen(url, timeout=30) as r:
+            print("whatsapp:", r.status)
+    except Exception as e:
+        print("whatsapp failed:", e, file=sys.stderr)
 
 
 if __name__ == "__main__":

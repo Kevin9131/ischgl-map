@@ -24,12 +24,15 @@ jobs:
           python-version: "3.12"
       - run: pip install beautifulsoup4
       - run: python fetch_status.py
+        env:
+          CALLMEBOT_PHONE: ${{ secrets.CALLMEBOT_PHONE }}
+          CALLMEBOT_APIKEY: ${{ secrets.CALLMEBOT_APIKEY }}
       - name: Commit if changed
         run: |
-          if [ -n "$(git status --porcelain status.json)" ]; then
+          if [ -n "$(git status --porcelain status.json notify_state.json)" ]; then
             git config user.name "lift-status bot"
             git config user.email "actions@users.noreply.github.com"
-            git add status.json
+            git add status.json notify_state.json
             git commit -m "Lift status $(date -u +'%Y-%m-%d %H:%M') UTC"
             git push
           fi

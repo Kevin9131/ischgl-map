@@ -44,6 +44,16 @@ As a backup, a GitHub Action (`.github/workflows/lift-status.yml`) runs `fetch_s
 
 You can also start the workflow by hand: **Actions → Lift & piste status → Run workflow**.
 
+### WhatsApp alerts (optional)
+
+The status job can send you a WhatsApp message when a lift or piste opens that wasn't open the day before. It uses the free [CallMeBot](https://www.callmebot.com/blog/free-api-whatsapp-messages/) API for personal use.
+
+1. Follow CallMeBot's WhatsApp setup to get your API key.
+2. In the repo go to **Settings → Secrets and variables → Actions** and add two secrets: `CALLMEBOT_PHONE` (your number with country code, e.g. `+316…`) and `CALLMEBOT_APIKEY`.
+
+The first run sends a confirmation message. Without the secrets, nothing is sent.
+
+
 ## Files
 
 | File | What it is |
