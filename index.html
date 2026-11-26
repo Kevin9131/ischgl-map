@@ -1049,7 +1049,7 @@ html.dark .livebox.on{background:#123222}
 html.dark .mmsg{color:#7fe0a8}
 .thbtn{width:34px;height:34px;background:#fff;border-radius:4px;box-shadow:0 1px 5px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;cursor:pointer;border:0;padding:0;margin-top:8px!important;color:#15202b}
 .thbtn svg{width:19px;height:19px}
-.thbtn.camon{background:#0e7c86!important;color:#fff!important}.thbtn.camon svg{color:#fff!important}
+.thbtn.camon{background:#0e7c86!important;color:#fff!important}.thbtn.huton{background:#7a3e9d!important;color:#fff!important}.thbtn.camon svg{color:#fff!important}
 @media (max-width:760px){
   html.dark #grab,html.dark .tabs{background:var(--panel)}
   html.dark #grab span{background:#3a4552}
@@ -1779,6 +1779,12 @@ camCtl.onAdd=function(){const b=L.DomUtil.create('button','thbtn');L.DomEvent.di
 camCtl.draw=function(){if(!this.b)return;const on=!!state.show.cams;this.b.innerHTML=CAM_SVG;this.b.classList.toggle('camon',on);this.b.title=on?'Hide webcams':'Show webcams';this.b.setAttribute('aria-label',this.b.title);
   const ch=document.querySelector('.chip[data-k=cams]');if(ch)ch.classList.toggle('off',!on)};
 camCtl.addTo(map);
+const hutCtl=L.control({position:'topleft'});
+hutCtl.onAdd=function(){const b=L.DomUtil.create('button','thbtn');L.DomEvent.disableClickPropagation(b);b.onclick=()=>{state.show.huts=state.show.huts?0:1;render();this.draw()};this.b=b;this.draw();return b};
+hutCtl.draw=function(){if(!this.b)return;const on=!!state.show.huts;this.b.innerHTML=HUT_SVG.replace('fill="#fff"','fill="currentColor"');this.b.classList.toggle('huton',on);this.b.title=on?'Hide restaurants':'Show restaurants';this.b.setAttribute('aria-label',this.b.title);
+  const ch=document.querySelector('.chip[data-k=huts]');if(ch)ch.classList.toggle('off',!on)};
+hutCtl.addTo(map);
+const _rhut=render;render=function(){_rhut();hutCtl.draw()};
 const _rcam=render;render=function(){_rcam();state.show.cams?camLayer.addTo(map):map.removeLayer(camLayer)};
 
 // ===================== MY TRACKS (Ski Tracks GPX/KML import) =====================
