@@ -975,6 +975,18 @@ html.dark .seasonrow{color:#d9c17f}
   html.dark #sunfloat .sfh span{color:#d9c17f}html.dark #sunfloat .sfh a{color:#7fb3f0}
 }
 
+.smcp{width:26px;height:26px;border-radius:50%;background:var(--c);color:#fff;font:700 13px/22px system-ui,sans-serif;text-align:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4);box-sizing:border-box}
+.smcp.done{background:#1e8e3e}
+.thbtn.smon{background:var(--c)!important;color:#fff!important}
+.smtabs{display:flex;gap:6px;margin:8px 0}.smtabs button{flex:1;border:2px solid var(--c);background:transparent;color:inherit;border-radius:16px;padding:5px 0;font:600 13px system-ui,sans-serif;cursor:pointer}
+.smtabs button.on{background:var(--c);color:#fff}
+.smlvl{font-size:13px;margin:6px 0;line-height:1.4}.smprog{font-size:13px;margin:6px 0;padding:6px 8px;border-radius:8px;background:#f1f4f7}
+.smsteps{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;margin:8px 0;font-size:12.5px}
+.smst{padding:2px 7px;border-radius:10px;background:#eef1f4;white-space:nowrap}.smst.pis{font-weight:700;background:#fde7e7}.smst.lift{background:#e8eef7}.smst.bus{background:#fff3d6}
+.smst.cl{text-decoration:line-through;opacity:.55}.smar{color:#9aa6b2;font-size:12px}
+.smnote{font-size:11.5px;color:#6b7785;line-height:1.4;margin:8px 0}
+.smoff{border:1px solid #c9d1d9;background:transparent;color:inherit;border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+html.dark .smprog{background:#1b232c}html.dark .smst{background:#222c36}html.dark .smst.pis{background:#3a2326}html.dark .smst.lift{background:#1f2b3a}html.dark .smst.bus{background:#3a3120}html.dark .smoff{border-color:#2a3440}
 /* ===== dark mode ===== */
 html.dark{color-scheme:dark;--bg:#0f151b;--panel:#161d25;--ink:#e6ebf0;--muted:#93a1b0;--line:#2a3440;--accent:#5ea2ff;--lift:#4a5260;--black:#000;--s2:#1e2731}
 html.dark #map{background:#141b22}
@@ -1927,6 +1939,79 @@ function liveSummary(){if(!LIVE.data){return LIVE.err==='blocked'?`<div class="l
   return `<div class="livebox on"><span class="ldot on"></span><b>${lo} of ${L.length} lifts</b> and <b>${so} of ${S.length} pistes</b> open · resort update ${d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${LIVE.err==='offline'?' · <span style="color:#b45309">offline, saved data</span>':''}<br><span class="lsub">Closed lifts and pistes are faded on the map, and routes avoid them.</span></div>`}
 setInterval(()=>{if(document.visibilityState==='visible')liveLoad()},3*60e3);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')liveLoad()});
+
+// ===================== SMUGGLER'S TRAIL (Schmugglerrunde) =====================
+// Official circuits of the Silvretta Arena. Checkpoints from ischgl.com, route order
+// (lifts and pistes between checkpoints) from the Samnaun smuggler's-circuit flyer.
+const SMUG=[
+ {k:'gold',name:'Gold',col:'#c9a227',km:37.2,hm:6870,dur:'≈ 4 h',lvl:'Longest and hardest: red and black pistes',
+  steps:'L:A3 P:2 L:C3 P:30 L:E2 P:32 L:D1 P:80 P:40 L:E5 P:42 P:40 L:E4 P:80 P:80a L:L1 P:69 L:N2 P:66 L:M1 P:76 L:M2 P:67 L:N4 P:71 L:O1 P:14 P:12 P:11 L:B1 P:7 L:F1 P:4 P:1 P:1a',
+  cps:['A3:v','C3:t','E2:t','D1:t','E5:t','L1:v','N2:t','M1:t','N4:t','O1:t','B1:t','F1:t','A3:v']},
+ {k:'silver',name:'Silver',col:'#8e9aa6',km:25.0,hm:4765,dur:'≈ 3.5 h',lvl:'Mostly blue and red, shorter',
+  steps:'L:A3 P:2 L:C3 P:30 L:E2 P:38 L:E4 P:40 P:80 P:80a L:L1 P:69 L:N2 P:66 L:M2 P:67 L:N1 P:10 L:B8 P:4 P:1 P:1a',
+  cps:['A3:v','C3:t','E2:t','E4:v','L1:v','N2:t','M2:t','N1:t','B8:t','A3:v']},
+ {k:'bronze',name:'Bronze',col:'#b06f3a',km:19.8,hm:3191,dur:'≈ 4 h',lvl:'Blue pistes only, more lift rides',
+  steps:'L:A3 L:B8 P:6 L:B2 P:62 P:60 X:bus L:L1 P:69 L:N4 P:71 L:O4 P:11 P:2 L:C2 L:D2 P:22 P:23 L:C4 P:6 L:A3',
+  cps:['A3:v','B8:t','B2:t','P62','L1:v','N4:t','O4:t','C2:v','D2:t','C4:t','A3:v']}];
+function smugLifts(ref){return DATA.lifts.filter(l=>l.ref===ref)}
+function smugCp(code){ // [lat,lon,label]
+  if(code==='P62'){let best=null;DATA.runs.forEach(r=>{if(r.n!=='62')return;r.p.forEach(q=>{if(!best||q[2]<best[2])best=q})});return best?[best[0],best[1],'Piste 62 → Laret']:null}
+  const [ref,end]=code.split(':');const ls=smugLifts(ref);if(!ls.length)return null;
+  const l=end==='v'?ls.reduce((a,b)=>a.b<=b.b?a:b):ls.reduce((a,b)=>a.top>=b.top?a:b);const q=end==='v'?l.p[0]:l.p[l.p.length-1];
+  const nm=l.n.replace(/\s+I+$/,'');return [q[0],q[1],`${ref} ${nm} ${end==='v'?'valley':'top'}`]}
+SMUG.forEach(c=>{c.cp=c.cps.map(smugCp);c.st=c.steps.split(' ').map(s=>{const [t,v]=s.split(':');return{t,v}})});
+map.createPane('smugPane').style.zIndex=390;const smugCanvas=L.canvas({pane:'smugPane',padding:0.5});
+const smugLayer=L.layerGroup();let smugSel=null;
+const SMUG_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 8.5c-.6-.9-1.6-1.4-2.7-1.4-1.6 0-2.8 1-2.8 2.3 0 3 5.6 1.8 5.6 4.8 0 1.3-1.3 2.3-2.9 2.3-1.2 0-2.3-.6-2.9-1.5M12 5.5v1.6M12 16.9v1.6"/></svg>';
+// ---- progress: checkpoints reached on one day (live GPS today, or an imported Ski Tracks day)
+const SMUG_R=110; // metres
+function smugNear(a,b){return ((a[0]-b[0])*111e3)**2+((a[1]-b[1])*76e3)**2<SMUG_R*SMUG_R}
+function smugToday(){return new Date().toISOString().slice(0,10)}
+let SMUG_GPS={};try{SMUG_GPS=JSON.parse(localStorage.getItem('ischgl-smug')||'{}')}catch(e){}
+function smugGpsSet(k){const d=smugToday();if(!SMUG_GPS[k]||SMUG_GPS[k].d!==d)SMUG_GPS[k]={d,hit:[]};return SMUG_GPS[k]}
+setInterval(()=>{if(typeof gps==='undefined'||!gps.ll)return;let ch=false;
+  SMUG.forEach(c=>{const s=smugGpsSet(c.k);c.cp.forEach((p,i)=>{if(p&&!s.hit.includes(i)&&smugNear(gps.ll,p)){s.hit.push(i);ch=true}})});
+  if(ch){try{localStorage.setItem('ischgl-smug',JSON.stringify(SMUG_GPS))}catch(e){}if(smugSel)smugCard(smugSel)}},8000);
+function smugDays(c){ // best imported day
+  if(typeof TRK==='undefined'||!TRK.days.length)return null;let best=null;
+  TRK.days.forEach(d=>{const hit=new Set();for(let j=0;j<d.pts.length;j+=2){const q=d.pts[j];c.cp.forEach((p,i)=>{if(p&&!hit.has(i)&&smugNear(q,p))hit.add(i)})}
+    if(!best||hit.size>best.hit.size)best={date:d.date,hit}});return best}
+// ---- live status of everything on the route
+function smugLive(c){if(!LIVE.fresh)return null;const closed=[];
+  c.st.forEach(s=>{if(s.t==='L'){const ls=smugLifts(s.v);if(ls.some(l=>liftLive(l)&&liftLive(l)!=='open'))closed.push(s.v)}
+    else if(s.t==='P'){const rs=DATA.runs.filter(r=>r.n===s.v);if(rs.length&&rs.every(r=>{const x=runLive(r);return x&&x!=='open'}))closed.push(s.v)}});
+  return [...new Set(closed)]}
+function smugDraw(){smugLayer.clearLayers();if(!smugSel){map.removeLayer(smugLayer);return}const c=SMUG.find(x=>x.k===smugSel);
+  const nums=new Set(c.st.filter(s=>s.t==='P').map(s=>s.v)),refs=new Set(c.st.filter(s=>s.t==='L').map(s=>s.v));
+  DATA.runs.forEach(r=>{if(nums.has(r.n))L.polyline(r.p.map(q=>[q[0],q[1]]),{renderer:smugCanvas,color:c.col,weight:16,opacity:.8,lineCap:'round',lineJoin:'round',interactive:false}).addTo(smugLayer)});
+  DATA.lifts.forEach(l=>{if(refs.has(l.ref))L.polyline(l.p.map(q=>[q[0],q[1]]),{renderer:smugCanvas,color:c.col,weight:13,opacity:.75,lineCap:'round',interactive:false}).addTo(smugLayer)});
+  const gs=smugGpsSet(c.k),best=smugDays(c);
+  c.cp.forEach((p,i)=>{if(!p)return;const last=i===c.cp.length-1;if(last&&c.cps[0]===c.cps[i])return;
+    const done=gs.hit.includes(i)||(best&&best.hit.has(i));
+    L.marker([p[0],p[1]],{zIndexOffset:1500,icon:L.divIcon({className:'',html:`<div class="smcp${done?' done':''}" style="--c:${c.col}">${done?'✓':i+1}</div>`,iconSize:[26,26],iconAnchor:[13,13]})})
+     .bindTooltip(`<b>${c.name} · checkpoint ${i+1}${i===0?' (start & finish)':''}</b><br>${p[2]}`,{direction:'top',offset:[0,-12]}).on('click',()=>smugCard(c.k)).addTo(smugLayer)});
+  smugLayer.addTo(map)}
+function smugStepHTML(c,closed){const cl=new Set(closed||[]);const nm=ref=>{const l=smugLifts(ref)[0];return l?l.n.replace(/\s+I+$/,''):''};
+  return c.st.map(s=>s.t==='X'?'<span class="smst bus">ski bus / walk to the Twinliner</span>':
+    s.t==='L'?`<span class="smst lift${cl.has(s.v)?' cl':''}">🚡 ${s.v} ${nm(s.v)}</span>`:`<span class="smst pis${cl.has(s.v)?' cl':''}">${s.v}</span>`).join('<span class="smar">›</span>')}
+function smugCard(k){smugSel=k;smugDraw();ctlSmug.draw();const c=SMUG.find(x=>x.k===k);
+  const closed=smugLive(c),gs=smugGpsSet(c.k),best=smugDays(c),n=c.cp.length-1; // last = back at start
+  const todayHit=new Set(gs.hit.map(i=>i===n?0:i)).size;
+  const live=closed===null?'':closed.length?`<div class="lstat off">● Not complete today: ${closed.length} lift${closed.length>1?'s/pistes':'/piste'} on the route closed (${closed.join(', ')})</div>`:'<div class="lstat on">● Everything on this route is open now</div>';
+  const prog=`<div class="smprog"><b>Today:</b> ${todayHit} of ${n} checkpoints${todayHit>=n?' ✓ completed!':''}${best?` · <b>best tracked day</b> (${best.date||'?'}): ${new Set([...best.hit].map(i=>i===n?0:i)).size} of ${n}`:''}</div>`;
+  card(`<div class="hd"><div class="hutic" style="background:${c.col}">${SMUG_SVG}</div><div><h3>Smuggler's Trail · ${c.name}</h3><div class="sub">${c.km} km of piste · ${c.hm.toLocaleString('en')} m downhill · ${c.dur}</div></div><button class="x" aria-label="Close">×</button></div>
+  <div class="bd">${live}<div class="smtabs">${SMUG.map(x=>`<button data-k="${x.k}" class="${x.k===k?'on':''}" style="--c:${x.col}">${x.name}</button>`).join('')}</div>
+  <p class="smlvl">${c.lvl}. Start and finish at the Fimbabahn (A3) in Ischgl, or at the Twinliner (L1) in Samnaun. Visit all ${n} checkpoints on the same day.</p>
+  ${prog}<div class="smsteps">${smugStepHTML(c,closed)}</div>
+  <p class="smnote">Numbered circles are the checkpoints; they tick off when your GPS passes them today or when an imported Ski Tracks day did. Highlighted pistes show the whole piste, follow the signs on the mountain. Route from ischgl.com and the Samnaun smuggler's-circuit flyer.</p>
+  <button class="smoff">Hide route</button></div>`);
+  const el=document.getElementById('card');el.querySelectorAll('.smtabs button').forEach(b=>b.onclick=()=>smugCard(b.dataset.k));
+  el.querySelector('.smoff').onclick=()=>{smugSel=null;smugDraw();ctlSmug.draw();clearSel()};
+  const b=L.latLngBounds(c.cp.filter(Boolean).map(p=>[p[0],p[1]]));if(b.isValid()&&!map.getBounds().contains(b))map.fitBounds(b,{padding:[30,30]})}
+const ctlSmug=L.control({position:'topleft'});
+ctlSmug.onAdd=function(){const b=L.DomUtil.create('button','thbtn');L.DomEvent.disableClickPropagation(b);b.onclick=()=>{if(smugSel&&document.getElementById('card').style.display!=='none'){smugSel=null;smugDraw();this.draw();clearSel()}else smugCard(smugSel||'bronze')};this.b=b;this.draw();return b};
+ctlSmug.draw=function(){if(!this.b)return;const on=!!smugSel;this.b.innerHTML=SMUG_SVG;this.b.classList.toggle('smon',on);if(on)this.b.style.setProperty('--c',SMUG.find(x=>x.k===smugSel).col);this.b.title="Smuggler's Trail";this.b.setAttribute('aria-label',this.b.title)};
+ctlSmug.addTo(map);
 
 
 // ===== sun UI =====

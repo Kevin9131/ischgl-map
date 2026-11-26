@@ -14,6 +14,7 @@ An interactive piste map of Ischgl (AT) and Samnaun (CH), built to use on your p
 - **Live GPS** showing where you are on the map
 - **Meeting point**: long-press the map, set a time and share the link
 - **My pistes**: import your Ski Tracks GPX/KML files to see which pistes you've boarded and which are still left
+- **Smuggler's Trail**: the official Gold, Silver and Bronze Schmugglerrunden on the map, with numbered checkpoints, which lifts and pistes on the route are closed today, and a tick for every checkpoint you pass (live GPS or an imported Ski Tracks day)
 - **Webcams**: the official Ischgl and Samnaun webcams, live streams and 360° panoramas on the map. Tap one to open it on ischgl.com
 - **SOS**: ski patrol and emergency numbers, with your current position
 - **Dark mode**: follows your phone's setting, or tap the 🌙 button to switch
