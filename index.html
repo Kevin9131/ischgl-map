@@ -984,6 +984,7 @@ html.dark .seasonrow{color:#d9c17f}
 .smsteps{display:flex;flex-wrap:wrap;align-items:center;gap:4px 2px;margin:8px 0;font-size:12.5px}
 .smst{padding:2px 7px;border-radius:10px;background:#eef1f4;white-space:nowrap}.smst.pis{font-weight:700;background:#fde7e7}.smst.lift{background:#e8eef7}.smst.bus{background:#fff3d6}
 .smst.cl{text-decoration:line-through;opacity:.55}.smar{color:#9aa6b2;font-size:12px}
+.smdet summary{cursor:pointer;font-size:13px;font-weight:600;margin:6px 0}
 .smnote{font-size:11.5px;color:#6b7785;line-height:1.4;margin:8px 0}
 .smoff{border:1px solid #c9d1d9;background:transparent;color:inherit;border-radius:8px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
 html.dark .smprog{background:#1b232c}html.dark .smst{background:#222c36}html.dark .smst.pis{background:#3a2326}html.dark .smst.lift{background:#1f2b3a}html.dark .smst.bus{background:#3a3120}html.dark .smoff{border-color:#2a3440}
@@ -1960,7 +1961,7 @@ function smugCp(code){ // [lat,lon,label]
   const l=end==='v'?ls.reduce((a,b)=>a.b<=b.b?a:b):ls.reduce((a,b)=>a.top>=b.top?a:b);const q=end==='v'?l.p[0]:l.p[l.p.length-1];
   const nm=l.n.replace(/\s+I+$/,'');return [q[0],q[1],`${ref} ${nm} ${end==='v'?'valley':'top'}`]}
 SMUG.forEach(c=>{c.cp=c.cps.map(smugCp);c.st=c.steps.split(' ').map(s=>{const [t,v]=s.split(':');return{t,v}})});
-map.createPane('smugPane').style.zIndex=390;const smugCanvas=L.canvas({pane:'smugPane',padding:0.5});
+map.createPane('smugVeil').style.zIndex=420;map.createPane('smugPane').style.zIndex=430;map.getPane('smugVeil').style.pointerEvents='none';map.getPane('smugPane').style.pointerEvents='none';const smugVeilCanvas=L.canvas({pane:'smugVeil',padding:0.5});const smugCanvas=L.canvas({pane:'smugPane',padding:0.5});
 const smugLayer=L.layerGroup();let smugSel=null;
 const SMUG_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 8.5c-.6-.9-1.6-1.4-2.7-1.4-1.6 0-2.8 1-2.8 2.3 0 3 5.6 1.8 5.6 4.8 0 1.3-1.3 2.3-2.9 2.3-1.2 0-2.3-.6-2.9-1.5M12 5.5v1.6M12 16.9v1.6"/></svg>';
 // ---- progress: checkpoints reached on one day (live GPS today, or an imported Ski Tracks day)
@@ -1983,8 +1984,14 @@ function smugLive(c){if(!LIVE.fresh)return null;const closed=[];
   return [...new Set(closed)]}
 function smugDraw(){smugLayer.clearLayers();if(!smugSel){map.removeLayer(smugLayer);return}const c=SMUG.find(x=>x.k===smugSel);
   const nums=new Set(c.st.filter(s=>s.t==='P').map(s=>s.v)),refs=new Set(c.st.filter(s=>s.t==='L').map(s=>s.v));
-  DATA.runs.forEach(r=>{if(nums.has(r.n))L.polyline(r.p.map(q=>[q[0],q[1]]),{renderer:smugCanvas,color:c.col,weight:16,opacity:.8,lineCap:'round',lineJoin:'round',interactive:false}).addTo(smugLayer)});
-  DATA.lifts.forEach(l=>{if(refs.has(l.ref))L.polyline(l.p.map(q=>[q[0],q[1]]),{renderer:smugCanvas,color:c.col,weight:13,opacity:.75,lineCap:'round',interactive:false}).addTo(smugLayer)});
+  // veil dims the rest of the map, then the route is drawn on top: dark outline + circuit colour
+  L.rectangle([[45.5,8.5],[48.5,12.5]],{renderer:smugVeilCanvas,stroke:false,fillColor:DARK?'#0f151b':'#ffffff',fillOpacity:DARK?.6:.62,interactive:false}).addTo(smugLayer);
+  const rl=DATA.runs.filter(r=>nums.has(r.n)).map(r=>r.p.map(q=>[q[0],q[1]])),ll=DATA.lifts.filter(l=>refs.has(l.ref)).map(l=>l.p.map(q=>[q[0],q[1]]));
+  const edge=DARK?'#ffffff':'#1b232c';
+  rl.concat(ll).forEach(g=>L.polyline(g,{renderer:smugCanvas,color:edge,weight:10,opacity:.9,lineCap:'round',lineJoin:'round',interactive:false}).addTo(smugLayer));
+  rl.forEach(g=>L.polyline(g,{renderer:smugCanvas,color:c.col,weight:6,opacity:1,lineCap:'round',lineJoin:'round',interactive:false}).addTo(smugLayer));
+  ll.forEach(g=>L.polyline(g,{renderer:smugCanvas,color:c.col,weight:5,opacity:1,dashArray:'1 9',lineCap:'round',interactive:false}).addTo(smugLayer));
+  ll.forEach(g=>L.polyline(g,{renderer:smugCanvas,color:c.col,weight:2.5,opacity:1,interactive:false}).addTo(smugLayer));
   const gs=smugGpsSet(c.k),best=smugDays(c);
   c.cp.forEach((p,i)=>{if(!p)return;const last=i===c.cp.length-1;if(last&&c.cps[0]===c.cps[i])return;
     const done=gs.hit.includes(i)||(best&&best.hit.has(i));
@@ -2001,17 +2008,18 @@ function smugCard(k){smugSel=k;smugDraw();ctlSmug.draw();const c=SMUG.find(x=>x.
   const prog=`<div class="smprog"><b>Today:</b> ${todayHit} of ${n} checkpoints${todayHit>=n?' ✓ completed!':''}${best?` · <b>best tracked day</b> (${best.date||'?'}): ${new Set([...best.hit].map(i=>i===n?0:i)).size} of ${n}`:''}</div>`;
   card(`<div class="hd"><div class="hutic" style="background:${c.col}">${SMUG_SVG}</div><div><h3>Smuggler's Trail · ${c.name}</h3><div class="sub">${c.km} km of piste · ${c.hm.toLocaleString('en')} m downhill · ${c.dur}</div></div><button class="x" aria-label="Close">×</button></div>
   <div class="bd">${live}<div class="smtabs">${SMUG.map(x=>`<button data-k="${x.k}" class="${x.k===k?'on':''}" style="--c:${x.col}">${x.name}</button>`).join('')}</div>
-  <p class="smlvl">${c.lvl}. Start and finish at the Fimbabahn (A3) in Ischgl, or at the Twinliner (L1) in Samnaun. Visit all ${n} checkpoints on the same day.</p>
-  ${prog}<div class="smsteps">${smugStepHTML(c,closed)}</div>
-  <p class="smnote">Numbered circles are the checkpoints; they tick off when your GPS passes them today or when an imported Ski Tracks day did. Highlighted pistes show the whole piste, follow the signs on the mountain. Route from ischgl.com and the Samnaun smuggler's-circuit flyer.</p>
+  <p class="smlvl">${c.lvl}. Start at the Fimbabahn (A3) or the Twinliner (L1); all ${n} checkpoints on one day.</p>
+  ${prog}<details class="smdet"${isMobile()?'':' open'}><summary>Route step by step</summary><div class="smsteps">${smugStepHTML(c,closed)}</div>
+  <p class="smnote">Numbered circles are the checkpoints; they tick off when your GPS passes them today or when an imported Ski Tracks day did. Highlighted pistes show the whole piste, follow the signs on the mountain. Route from ischgl.com and the Samnaun smuggler's-circuit flyer.</p></details>
   <button class="smoff">Hide route</button></div>`);
   const el=document.getElementById('card');el.querySelectorAll('.smtabs button').forEach(b=>b.onclick=()=>smugCard(b.dataset.k));
   el.querySelector('.smoff').onclick=()=>{smugSel=null;smugDraw();ctlSmug.draw();clearSel()};
-  const b=L.latLngBounds(c.cp.filter(Boolean).map(p=>[p[0],p[1]]));if(b.isValid()&&!map.getBounds().contains(b))map.fitBounds(b,{padding:[30,30]})}
+  const b=L.latLngBounds(c.cp.filter(Boolean).map(p=>[p[0],p[1]]));if(b.isValid()){const ch=isMobile()?el.offsetHeight:0,cw=isMobile()?0:el.offsetWidth;map.fitBounds(b,{paddingTopLeft:[50,30],paddingBottomRight:[20+cw,20+ch]})}}
 const ctlSmug=L.control({position:'topleft'});
 ctlSmug.onAdd=function(){const b=L.DomUtil.create('button','thbtn');L.DomEvent.disableClickPropagation(b);b.onclick=()=>{if(smugSel&&document.getElementById('card').style.display!=='none'){smugSel=null;smugDraw();this.draw();clearSel()}else smugCard(smugSel||'bronze')};this.b=b;this.draw();return b};
 ctlSmug.draw=function(){if(!this.b)return;const on=!!smugSel;this.b.innerHTML=SMUG_SVG;this.b.classList.toggle('smon',on);if(on)this.b.style.setProperty('--c',SMUG.find(x=>x.k===smugSel).col);this.b.title="Smuggler's Trail";this.b.setAttribute('aria-label',this.b.title)};
 ctlSmug.addTo(map);
+const _rsm=render;render=function(){_rsm();if(smugSel)smugDraw()};
 
 
 // ===== sun UI =====
