@@ -1111,7 +1111,7 @@ function themeColours(){DARK=document.documentElement.classList.contains('dark')
 const DIFFNAME={blue:'Blue · easy',red:'Red · intermediate',black:'Black · difficult',route:'Ski route (ungroomed, unpatrolled)'};
 const HUT_SVG='<svg viewBox="0 0 24 24" fill="#fff"><path d="M8.1 13.34l2.83-2.83L3.91 3.5a4.008 4.008 0 000 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z"/></svg>';
 const LIFT_GROUP={gondola:'cable',cable_car:'cable',chair_lift:'chair','t-bar':'drag',platter:'drag',drag_lift:'drag',magic_carpet:'drag'};
-const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:1,labels:1,arrows:1,weather:1,relief:1,mytracks:1,live:1,cams:0},mode:'diff',tab:'huts',q:'',sel:null};
+const state={show:{blue:1,red:1,black:1,route:1,cable:1,chair:1,drag:1,huts:0,labels:1,arrows:1,weather:1,relief:1,mytracks:1,live:1,cams:0},mode:'diff',tab:'huts',q:'',sel:null};
 
 // rotated CRS: 180° (south up) so the Ischgl valley sits at the bottom
 const SM=L.Projection.SphericalMercator;
@@ -1315,7 +1315,7 @@ function setOrientation(r){const c=map.getCenter(),z=map.getZoom();ROT=r;if(reli
   const s=state.sel;if(s){const [k,...v]=s.split(':');const id=v.join(':');if(k==='r')selectRun(runGroups[id]);if(k==='l')selectLift(DATA.lifts[+id]);if(k==='h')selectHut(DATA.huts[+id])}}
 
 // --- selection
-function clearSel(){state.selGroup=null;hl.clearLayers();document.getElementById('card').style.display='none';hutMarkers.forEach(m=>{const el=m.getElement();el&&el.firstChild.classList.remove('sel')});document.querySelectorAll('.cammk.sel').forEach(e=>e.classList.remove('sel'));state.sel=null;markList()}
+function clearSel(){if(state.tmpHut){if(!state.show.huts)map.removeLayer(state.tmpHut);state.tmpHut=null}state.selGroup=null;hl.clearLayers();document.getElementById('card').style.display='none';hutMarkers.forEach(m=>{const el=m.getElement();el&&el.firstChild.classList.remove('sel')});document.querySelectorAll('.cammk.sel').forEach(e=>e.classList.remove('sel'));state.sel=null;markList()}
 map.on('click',clearSel);
 function card(html){const c=document.getElementById('card');c.innerHTML=html;c.style.display='block';c.scrollTop=0;c.querySelector('.x').onclick=clearSel;if(isMobile()&&sheetState()!=='peek')sheet('peek')}
 function flyPad(){return isMobile()?{paddingTopLeft:[30,70],paddingBottomRight:[30,Math.min(innerHeight*0.55,420)],maxZoom:15.5,duration:.6}:{padding:[70,70],maxZoom:15.5,duration:.6}}
@@ -1352,7 +1352,7 @@ function selectLift(l,fly){clearSel();state.sel='l:'+l.i;
   card(`<div class="hd"><span class="badge b-lift" style="${l.uc?'background:#8a95a1':l.news?'background:#12a150':''}">${l.ref||'·'}</span><div><h3>${l.n}</h3><div class="sub">${l.tl}</div></div><button class="x" aria-label="Close">×</button></div>
   <div class="bd">${!l.uc&&LIVE.data&&liftLive(l)?`<div class="lstat ${liftLive(l)==='open'&&LIVE.fresh?'on':'off'}">${LIVE.fresh?(liftLive(l)==='open'?'● Open now':liftLive(l)==='prep'?'● Opening soon':'● Closed today'):'● No live status today'}</div>`:''}${l.news?`<div class="newnote${l.uc?' uc':''}" style="margin:0 0 6px">${l.uc?'🚧 ':'✨ '}${l.news}</div>`:''}<dl><dt>Direction</dt><dd>↑ ${l.b.toLocaleString('en')} m → ${l.top.toLocaleString('en')} m</dd><dt>Vertical rise</dt><dd>${(l.top-l.b).toLocaleString('en')} m</dd><dt>Length</dt><dd>${fmtLen(l.len)}</dd>${l.dur?`<dt>Ride time</dt><dd>~${Math.round(l.dur/60)} min</dd>`:''}${l.cap?`<dt>Capacity</dt><dd>${Math.round(l.cap).toLocaleString('en')} pers/h</dd>`:''}${feats?`<dt>Features</dt><dd>${feats}</dd>`:''}</dl>${l.uc?'':cardActions('lift',l.i,l.p[0])}</div>`);
 }
-function selectHut(h,fly){clearSel();state.sel='h:'+h.i;const el=hutMarkers[h.i].getElement();el&&el.firstChild.classList.add('sel');
+function selectHut(h,fly){clearSel();if(!state.show.huts){hutMarkers[h.i].addTo(map);state.tmpHut=hutMarkers[h.i]}state.sel='h:'+h.i;const el=hutMarkers[h.i].getElement();el&&el.firstChild.classList.add('sel');
   if(fly){const z=Math.max(map.getZoom(),15);if(isMobile()){const pt=map.project(h.ll,z).add([0,innerHeight*0.22]);map.flyTo(map.unproject(pt,z),z,{duration:.6})}else map.flyTo(h.ll,z,{duration:.6})}
   card(`<div class="hd"><div class="hutic">${HUT_SVG}</div><div><h3>${h.n}</h3><div class="sub">${h.area} · ${h.e.toLocaleString('en')} m · ${h.ctry==='CH'?'🇨🇭 Samnaun side':'🇦🇹 Ischgl side'}</div></div><button class="x" aria-label="Close">×</button></div>
   <div class="bd">${h.d}<dl><dt>Service</dt><dd>${h.svc}</dd>${h.hz?(()=>{const w=hutSunWindow(h,sunState.date);const ds=new Date(sunState.date+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'});return `<dt>Sun on terrace</dt><dd>${w.from==null?'none ('+ds+')':`${fmtT(w.from)}–${fmtT(w.to)} <span style="font-weight:400;color:#5b6b7a">(${ds}${w.gaps?', with breaks':''})</span>`}</dd>`})():''}</dl>${h.offpiste?'<div class="warn">Off the groomed pistes: reach it via a ski route or snowmobile taxi.</div>':''}${h.offpiste?'':cardActions('hut',h.i,h.ll)}${h.approx?`<div class="warn" style="background:#f1f4f7;color:#5b6b7a">${h.approxNote||'Marker placed at the nearby lift station; exact building position is approximate.'}</div>`:''}</div>`);
